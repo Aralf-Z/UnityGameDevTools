@@ -1,9 +1,9 @@
 {
   "dependencies": {
     "com.sanmon.gamedevtools": {
-      "version": "file:../../..",
+      "version": "file:com.sanmon.gamedevtools",
       "depth": 0,
-      "source": "local",
+      "source": "embedded",
       "dependencies": {
         "com.unity.modules.uielements": "1.0.0",
         "com.unity.modules.jsonserialize": "1.0.0",

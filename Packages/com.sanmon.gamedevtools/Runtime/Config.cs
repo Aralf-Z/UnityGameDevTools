@@ -7,7 +7,7 @@ using GameConsole.Extension;
 
 namespace GameConsole
 {
-    /// <summary> 开发工具设置及持久化数据的统一入口. </summary>
+    /// <summary> 开发工具设置及持久化数据的统一入口. </summary> 
     public static partial class Config
     {
         public static event Action e_onChanged;

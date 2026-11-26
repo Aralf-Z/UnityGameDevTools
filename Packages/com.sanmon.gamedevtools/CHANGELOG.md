@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Repository
+
+- 将仓库根目录恢复为标准 Unity 开发工程，包源码嵌入 Packages/com.sanmon.gamedevtools。
+- 增加可直接运行的 Development 场景和打开场景菜单，保留原有包资产 GUID 与测试。
+- Git 包安装地址新增 ?path=/Packages/com.sanmon.gamedevtools；旧开发工程缓存保留在本机忽略目录。
+
 ### Changed
 
 - 移除 UniTask 兼容及依赖，宏执行改用标准 Task 与 Unity 协程。

@@ -1,78 +1,35 @@
 # Game Dev Tools
 
-基于 UI Toolkit 的 Unity 游戏开发控制台，包含命令补全、调试参数面板、宏、日志、主题、字体切换与中英文本地化。
+基于 UI Toolkit 的 Unity 游戏开发控制台。仓库本身是标准 Unity 工程，可直接开发、运行及测试；可分发的 UPM 包嵌入在 `Packages/com.sanmon.gamedevtools`。
 
-| 项目 | 内容 |
-| --- | --- |
-| UPM 包名 | `com.sanmon.gamedevtools` |
-| 版本 | `0.1.0` |
-| Unity 基线 | `2022.3`，验证目标为 `2022.3.62f3` |
-| 运行时依赖 | Unity 内置模块，无第三方运行时依赖 |
-| 许可 | [MIT](LICENSE)，第三方组件见 [Third Party Notices.md](Third%20Party%20Notices.md) |
+## 开发
 
-## 安装
+1. 用 Unity Hub 添加并打开本仓库根目录，使用 **Unity 2022.3.62f3**。
+2. 打开 `Assets/Scenes/Development.unity`（也可使用菜单 `GameDevTools > Open Development Scene`）。
+3. 进入 Play Mode，按反引号键打开控制台，调试 Console、Cheat、Macro、Options。
+4. 在 `Packages/com.sanmon.gamedevtools` 中修改源码及资源，Unity 会直接编译本地嵌入式包。
 
-**发布状态：此次 UPM 迁移仅在本地完成，未提交或推送。下列 Game Dev Tools 地址要在迁移内容推送到远程 `master` 后才能用于 UPM 安装。**
+`Assets` 放开发场景和宿主脚本；通用功能与回归测试放在包内，避免复制源码导致重复编译。原有资源 GUID、程序集名称和命名空间保持不变。
 
-在 Unity 的 `Window > Package Manager` 中选择 `+ > Add package from git URL`，输入 Game Dev Tools 地址（迁移推送后可用）：
+## 测试
+
+`Window > General > Test Runner` 中运行 EditMode 和 PlayMode 测试，manifest 已通过 `testables` 启用包测试。命令行：
+
+```powershell
+unity test . --mode EditMode --output TestResults/editmode.xml
+unity test . --mode PlayMode --output TestResults/playmode.xml
+```
+
+缓存、IDE 文件和测试报告均由 `.gitignore` 排除。旧开发工程的本机缓存保留在忽略目录 `LegacyProjectCache~/DevelopmentProject`。
+
+## 在其他工程安装
+
+本地安装选择 `Packages/com.sanmon.gamedevtools/package.json`。本次目录改造推送到远程后，Git 安装地址需包含包路径：
 
 ```text
-https://github.com/Aralf-Z/UnityGameDevTools.git#master
+https://github.com/Aralf-Z/UnityGameDevTools.git?path=/Packages/com.sanmon.gamedevtools#master
 ```
 
-无需预装第三方异步库。Git 地址对应的提交由项目的 `Packages/packages-lock.json` 锁定；远程分支有新提交后，需要在 Package Manager 中更新该 Git 包。固定版本时，将 `#master` 替换为已存在的标签或完整提交 SHA；本次未创建版本标签。
+此前不含 `?path=` 的地址仅适用于旧目录结构。使用方应在迁移发布后更新地址，由 Unity 重新解析锁文件。
 
-### 使用本地仓库
-
-选择 `+ > Add package from disk` 并选中本仓库根目录的 `package.json`。开发者可以使用 `Samples~/DevelopmentProject` 内的 Unity 工程，其中已配置到仓库根目录的本地包依赖。
-
-## 快速开始
-
-1. 使用 Unity `2022.3` 打开目标工程。`Active Input Handling` 设为 `Input Manager (Old)` 或 `Both`，当前快捷键使用 `UnityEngine.Input`。
-2. 在场景中新建 GameObject，添加 `GameConsole.GameDevToolsController` 组件。
-3. 进入 Play Mode，按反引号键 `` ` `` 打开控制台；默认不需要修饰键。Inspector 或 Options 中可调整快捷键。
-4. 通过 Console、Cheat、Macro、Options 页使用命令、预设参数、宏和外观设置；界面首次打开时创建。
-
-在使用方的运行时脚本中添加命令：
-
-```csharp
-using RedSaw.CommandLineInterface;
-using UnityEngine;
-
-public static class GameCommands
-{
-    [Command(name: "Hello", desc: "输出问候", tag: "示例")]
-    public static void Hello()
-    {
-        Debug.Log("Hello from Game Dev Tools");
-    }
-}
-```
-
-在控制台输入 `Hello()`。使用自定义 `.asmdef` 的项目需显式引用 `GameDevTools.Runtime`；普通 `Assembly-CSharp` 脚本可直接使用。命令系统在初始化时发现包自身及已加载、直接引用运行时程序集的命令、属性与参数解析器。
-
-宏的 `WaitFor(命令调用)` 支持等待 `Task`、`Task<T>` 和 `IEnumerator`；普通命令调用不等待异步结果。`WaitFor()` 等待下一帧，`WaitFor(秒数)` 使用非缩放时间。停止宏取消当前等待与后续调度，不取消业务 Task。
-
-## 配置与资源
-
-设置、宏和输入历史统一保存在 `Application.persistentDataPath/development_data.json`，不写入 UPM 包。Inspector 中显示实际路径并提供打开按钮。
-
-主题、字体、图标和语言资源位于 `Runtime/GameUI/Resources`。Git 安装使用随包提供的 `Schema.asset`；修改资源时使用本地包或嵌入式包，避免直接编辑 `Library/PackageCache`。运行时自定义字体可通过控制器的 `RegisterFont` 注册。
-
-## 仓库目录
-
-```text
-package.json                  UPM 包清单
-Runtime/                      运行时代码与 Resources
-Editor/                       Inspector 与 Schema 更新器
-Tests/Editor/                 包兼容与跨程序集回归测试
-Documentation~/               使用说明、开发指南、编码规范
-Samples~/DevelopmentProject/  独立开发工程，本地引用根包
-CHANGELOG.md                  版本记录
-LICENSE                       项目 MIT 许可
-Third Party Notices.md        第三方组件及字体许可说明
-```
-
-开发工程用于打开和调试整个包，不是通过 Package Manager 的 Samples 按钮导入的资源样例，因此不登记在 `package.json.samples` 中。缓存和 IDE 生成文件不纳入版本管理。
-
-更多内容见 [使用说明](Documentation~/index.md)、[开发与验证](Documentation~/development.md) 和 [编码规范](Documentation~/coding-standard.md)。
+使用方法见 [包 README](Packages/com.sanmon.gamedevtools/README.md)，详细说明见 [开发与验证](Packages/com.sanmon.gamedevtools/Documentation~/development.md) 和 [编码规范](Packages/com.sanmon.gamedevtools/Documentation~/coding-standard.md)。许可：[MIT](LICENSE)。

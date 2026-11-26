@@ -1,7 +1,0 @@
-{
-  "name": "GameDevTools.Runtime.Tests",
-  "rootNamespace": "GameDevTools.Tests",
-  "references": ["GameDevTools.Runtime"],
-  "optionalUnityReferences": ["TestAssemblies"],
-  "autoReferenced": false
-}

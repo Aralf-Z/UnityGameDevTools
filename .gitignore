@@ -75,7 +75,7 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 /.idea
 
-# Nested Unity development project. Root rules above retain ignored local caches.
+# Unity caches are ignored at any depth, including archived development projects.
 **/[Ll]ibrary/
 **/[Tt]emp/
 **/[Oo]bj/
@@ -87,6 +87,3 @@ crashlytics-build.properties
 **/[Rr]ecordings/
 TestResults/
 *.tgz
-
-# Original local project caches, ignored by Unity because the name ends in ~.
-/LegacyProjectCache~/
