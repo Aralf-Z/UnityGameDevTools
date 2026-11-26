@@ -1,0 +1,282 @@
+{
+    "version": 1,
+    "skills": [
+        {
+            "id": "Bolt",
+            "enabled": true,
+            "displayName": "能量弹",
+            "description": "自动瞄准射程内最近的敌人，发射能量弹。",
+            "baseStats": {
+                "cooldown": 0.7200000286102295,
+                "radius": 18.0,
+                "damage": 21.0,
+                "projectileCount": 1,
+                "volleyCount": 1,
+                "orbiterCount": 3,
+                "volleyInterval": 0.11999999731779099,
+                "projectileSpeed": 18.0,
+                "projectileLifetime": 1.600000023841858,
+                "projectileSpread": 11.0,
+                "orbitSpeed": 2.700000047683716,
+                "bladeRotationSpeed": 140.0,
+                "orbitHeight": 0.8500000238418579,
+                "hitInterval": 0.4000000059604645,
+                "duration": 2.0,
+                "tickInterval": 0.5,
+                "knockback": 0.0,
+                "knockbackDecay": 6.0,
+                "heavyKnockbackMultiplier": 0.550000011920929,
+                "effectColor": "#E9CC7B",
+                "debuffs": []
+            },
+            "t1": {
+                "enabled": true,
+                "displayName": "加强型",
+                "additionalDescription": "每轮能量弹由 1 发增加至 3 发。",
+                "effectColor": "",
+                "overrides": [
+                    {
+                        "parameter": "ProjectileCount",
+                        "operation": "Set",
+                        "value": 3.0
+                    }
+                ],
+                "debuffOverrides": []
+            },
+            "t2": {
+                "enabled": true,
+                "displayName": "双发扳机",
+                "additionalDescription": "每次触发连续发射两轮，间隔 0.12 秒。",
+                "effectColor": "",
+                "overrides": [
+                    {
+                        "parameter": "VolleyCount",
+                        "operation": "Set",
+                        "value": 2.0
+                    },
+                    {
+                        "parameter": "VolleyInterval",
+                        "operation": "Set",
+                        "value": 0.11999999731779099
+                    }
+                ],
+                "debuffOverrides": []
+            },
+            "t3": {
+                "enabled": false,
+                "displayName": "预留",
+                "additionalDescription": "",
+                "effectColor": "",
+                "overrides": [],
+                "debuffOverrides": []
+            }
+        },
+        {
+            "id": "Orbit",
+            "enabled": true,
+            "displayName": "环形刃",
+            "description": "匕首持续环绕角色，对接触到的敌人造成伤害。",
+            "baseStats": {
+                "cooldown": 0.4000000059604645,
+                "radius": 2.5999999046325685,
+                "damage": 14.0,
+                "projectileCount": 1,
+                "volleyCount": 1,
+                "orbiterCount": 3,
+                "volleyInterval": 0.11999999731779099,
+                "projectileSpeed": 18.0,
+                "projectileLifetime": 1.600000023841858,
+                "projectileSpread": 11.0,
+                "orbitSpeed": 2.700000047683716,
+                "bladeRotationSpeed": 140.0,
+                "orbitHeight": 0.8500000238418579,
+                "hitInterval": 0.4000000059604645,
+                "duration": 2.0,
+                "tickInterval": 0.5,
+                "knockback": 0.0,
+                "knockbackDecay": 6.0,
+                "heavyKnockbackMultiplier": 0.550000011920929,
+                "effectColor": "#B4A5EB",
+                "debuffs": []
+            },
+            "t1": {
+                "enabled": true,
+                "displayName": "匕首云",
+                "additionalDescription": "环形匕首由 3 把增加至 6 把。",
+                "effectColor": "",
+                "overrides": [
+                    {
+                        "parameter": "OrbiterCount",
+                        "operation": "Set",
+                        "value": 6.0
+                    }
+                ],
+                "debuffOverrides": []
+            },
+            "t2": {
+                "enabled": true,
+                "displayName": "流血",
+                "additionalDescription": "命中施加 3 秒流血，每秒扣除敌人当前生命值的 5%；重复命中刷新持续时间。",
+                "effectColor": "",
+                "overrides": [],
+                "debuffOverrides": [
+                    {
+                        "type": "Bleed",
+                        "enabled": true,
+                        "duration": 3.0,
+                        "tickInterval": 1.0,
+                        "currentHealthPercent": 0.05000000074505806,
+                        "moveSpeedMultiplier": 0.25
+                    }
+                ]
+            },
+            "t3": {
+                "enabled": false,
+                "displayName": "预留",
+                "additionalDescription": "",
+                "effectColor": "",
+                "overrides": [],
+                "debuffOverrides": []
+            }
+        },
+        {
+            "id": "Nova",
+            "enabled": true,
+            "displayName": "冲击波",
+            "description": "释放土黄色冲击波，造成范围伤害并击退敌人。",
+            "baseStats": {
+                "cooldown": 5.0,
+                "radius": 5.900000095367432,
+                "damage": 35.0,
+                "projectileCount": 1,
+                "volleyCount": 1,
+                "orbiterCount": 3,
+                "volleyInterval": 0.11999999731779099,
+                "projectileSpeed": 18.0,
+                "projectileLifetime": 1.600000023841858,
+                "projectileSpread": 11.0,
+                "orbitSpeed": 2.700000047683716,
+                "bladeRotationSpeed": 140.0,
+                "orbitHeight": 0.8500000238418579,
+                "hitInterval": 0.4000000059604645,
+                "duration": 2.0,
+                "tickInterval": 0.5,
+                "knockback": 14.800000190734864,
+                "knockbackDecay": 6.0,
+                "heavyKnockbackMultiplier": 0.550000011920929,
+                "effectColor": "#C7A05A",
+                "debuffs": []
+            },
+            "t1": {
+                "enabled": true,
+                "displayName": "地震",
+                "additionalDescription": "冲击波冷却缩短至 2 秒。",
+                "effectColor": "",
+                "overrides": [
+                    {
+                        "parameter": "Cooldown",
+                        "operation": "Set",
+                        "value": 2.0
+                    }
+                ],
+                "debuffOverrides": []
+            },
+            "t2": {
+                "enabled": true,
+                "displayName": "大地震",
+                "additionalDescription": "冲击波半径扩大至基础的 2 倍。",
+                "effectColor": "",
+                "overrides": [
+                    {
+                        "parameter": "Radius",
+                        "operation": "Multiply",
+                        "value": 2.0
+                    }
+                ],
+                "debuffOverrides": []
+            },
+            "t3": {
+                "enabled": false,
+                "displayName": "预留",
+                "additionalDescription": "",
+                "effectColor": "",
+                "overrides": [],
+                "debuffOverrides": []
+            }
+        },
+        {
+            "id": "Frost",
+            "enabled": true,
+            "displayName": "冰霜领域",
+            "description": "白色冲击留下持续 2 秒的冰霜区域，冻结区域内敌人并造成少量持续伤害。",
+            "baseStats": {
+                "cooldown": 8.0,
+                "radius": 3.625,
+                "damage": 2.0,
+                "projectileCount": 1,
+                "volleyCount": 1,
+                "orbiterCount": 3,
+                "volleyInterval": 0.11999999731779099,
+                "projectileSpeed": 18.0,
+                "projectileLifetime": 1.600000023841858,
+                "projectileSpread": 11.0,
+                "orbitSpeed": 2.700000047683716,
+                "bladeRotationSpeed": 140.0,
+                "orbitHeight": 0.8500000238418579,
+                "hitInterval": 0.4000000059604645,
+                "duration": 2.0,
+                "tickInterval": 0.5,
+                "knockback": 0.0,
+                "knockbackDecay": 6.0,
+                "heavyKnockbackMultiplier": 0.550000011920929,
+                "effectColor": "#FFFFFF",
+                "debuffs": [
+                    {
+                        "type": "Freeze",
+                        "enabled": true,
+                        "duration": 0.15000000596046449,
+                        "tickInterval": 1.0,
+                        "currentHealthPercent": 0.05000000074505806,
+                        "moveSpeedMultiplier": 0.25
+                    }
+                ]
+            },
+            "t1": {
+                "enabled": true,
+                "displayName": "寒冷",
+                "additionalDescription": "冻结区域持续时间延长至 6 秒。",
+                "effectColor": "",
+                "overrides": [
+                    {
+                        "parameter": "Duration",
+                        "operation": "Set",
+                        "value": 6.0
+                    }
+                ],
+                "debuffOverrides": []
+            },
+            "t2": {
+                "enabled": true,
+                "displayName": "风暴",
+                "additionalDescription": "冻结区域半径扩大至基础的 2 倍。",
+                "effectColor": "",
+                "overrides": [
+                    {
+                        "parameter": "Radius",
+                        "operation": "Multiply",
+                        "value": 2.0
+                    }
+                ],
+                "debuffOverrides": []
+            },
+            "t3": {
+                "enabled": false,
+                "displayName": "预留",
+                "additionalDescription": "",
+                "effectColor": "",
+                "overrides": [],
+                "debuffOverrides": []
+            }
+        }
+    ]
+}

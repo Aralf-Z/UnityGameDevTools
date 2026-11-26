@@ -44,7 +44,8 @@ namespace Sanmon.SurvivorDemo
         public static readonly Color Enemy = Hex("F28673");
         public static readonly Color Tank = Hex("CC668A");
         public static readonly Color Gold = Hex("E9CC7B");
-        public static readonly Color Frost = Hex("A4DDF4");
+        public static readonly Color Frost = Hex("FFFFFF");
+        public static readonly Color Shockwave = Hex("C7A05A");
         public static readonly Color Violet = Hex("B4A5EB");
         public static readonly Color Text = Hex("F5F0E5");
         public static readonly Color Muted = Hex("94ABB4");

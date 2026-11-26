@@ -39,7 +39,7 @@ namespace Sanmon.SurvivorDemo
         [Command(name: "DemoHelp", desc: "范例入口：玩法、命令、属性、宏和工具生命周期", tag: "示例/说明")]
         [MethodAlias("查看接入说明")]
         public static string Help() =>
-            "WASD/方向键移动；1/左键能量弹；2 冲击波；3 冰霜；Space 冲刺；Esc 暂停；F1 开关工具。\n" +
+            "WASD/方向键移动；战斗技能按冷却自动释放；Space 冲刺；Esc 暂停；F1 开关工具。\n" +
             "命令：DemoSpawn(\"Tank\", 3)、DemoCast(\"Frost\")、DemoTeleport(\"5,8\")、DemoInspect()。\n" +
             "属性：@DemoHealth = 80、@DemoSpeed = 8、@DemoGodMode = true、@DemoPaused = true；@DemoEnemyCount 只读。\n" +
             "Cheat 面板包含分类、中文别名、参数编辑与参数预设。Macro 面板包含内置快捷宏和三个 [示例] 多行宏。\n" +
@@ -77,7 +77,7 @@ namespace Sanmon.SurvivorDemo
         [MethodAlias("复活玩家")]
         public static void Revive() => Game.Revive();
 
-        [Command(name: "DemoExperience", desc: "增加经验并强化技能，测试升级反馈", tag: "示例/玩家")]
+        [Command(name: "DemoExperience", desc: "增加经验，升级后弹出四选一技能升级界面", tag: "示例/玩家")]
         [MethodAlias("增加经验", "经验")]
         public static int Experience(int amount = 20) { Game.AddExperience(amount); return Game.Stats.Level; }
 
@@ -121,7 +121,7 @@ namespace Sanmon.SurvivorDemo
         [Macro("[快捷] 冲击波", "\"Nova\", true", "立即释放冲击波")]
         public static bool Cast(string skill = "Nova", bool force = true) => Game.TryCast(ParseEnum<SkillKind>(skill), force);
 
-        [Command(name: "DemoSkillLevel", desc: "技能等级 0–10，0 为禁用", tag: "示例/技能")]
+        [Command(name: "DemoSkillLevel", desc: "0 禁用，1 基础，2 为 T1，3 为 T2，4 为 T3；最高阶按 JSON 配置", tag: "示例/技能")]
         [MethodAlias("设置技能等级", "技能", "等级")]
         public static int SkillLevel(string skill = "Bolt", int level = 3) { var kind = ParseEnum<SkillKind>(skill); Game.SetSkillLevel(kind, level); return Game.SkillLevel(kind); }
 
@@ -230,13 +230,18 @@ namespace Sanmon.SurvivorDemo
             new ParamDefine("\"Tank\", 3", "重型敌人 ×3", "缓慢、高生命", "重型", "Tank", LoadPresetIcon),
             new ParamDefine("\"Grunt\", 180", "压力测试 ×180", "达到实例上限，测试日志和性能浮窗", "压力", "Grunt", LoadPresetIcon)
         };
-        public static List<ParamDefine> SkillPresets() => new()
+        public static List<ParamDefine> SkillPresets()
         {
-            new ParamDefine("\"Bolt\", true", "能量弹", "朝最近敌人发射扇形弹", "攻击", "Bolt", LoadPresetIcon),
-            new ParamDefine("\"Orbit\", true", "强化环绕刃", "提高持续近身伤害", "攻击", "Orbit", LoadPresetIcon),
-            new ParamDefine("\"Nova\", true", "冲击波", "周围范围伤害", "范围", "Nova", LoadPresetIcon),
-            new ParamDefine("\"Frost\", true", "冰霜脉冲", "范围减速和伤害", "控制", "Frost", LoadPresetIcon)
-        };
+            var catalog = SurvivorArena.Instance?.SkillCatalog ?? SurvivorSkills.Load();
+            var result = new List<ParamDefine>();
+            for (var i = 0; i < 4; i++)
+            {
+                var skill = (SkillKind)i;
+                var definition = catalog.Get(skill);
+                result.Add(new ParamDefine("\"" + skill + "\", true", definition.displayName, definition.description, i < 2 ? "攻击" : "范围", skill.ToString(), LoadPresetIcon));
+            }
+            return result;
+        }
         public static List<ParamDefine> TeleportPresets() => new()
         {
             new ParamDefine("\"0,0\"", "场地中心", "自定义 ArenaPoint 参数", "坐标"),

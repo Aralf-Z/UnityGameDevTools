@@ -1052,7 +1052,7 @@ Button.search-history-entry:hover, Button.search-history-entry.search-history-ho
 
 .theme-dialog-surface {
     padding: 16px;
-    -unity-slice-scale: 0.75;
+    -unity-slice-scale: 0.75px;
 }
 
 

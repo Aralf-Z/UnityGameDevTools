@@ -1,0 +1,7 @@
+{
+  "name": "Sanmon.SurvivorDemo.Editor",
+  "rootNamespace": "Sanmon.SurvivorDemo.Editor",
+  "references": ["Sanmon.SurvivorDemo"],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": true
+}
