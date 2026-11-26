@@ -1164,7 +1164,7 @@ Button.search-history-entry:hover, Button.search-history-entry.search-history-ho
     -unity-slice-right: 24;
     -unity-slice-top: 24;
     -unity-slice-bottom: 24;
-    -unity-slice-scale: 0.5;
+    -unity-slice-scale: 0.5px;
 }
 
 .dev-window > .theme-shadow {
@@ -1172,7 +1172,7 @@ Button.search-history-entry:hover, Button.search-history-entry.search-history-ho
     right: -7px;
     top: -7px;
     bottom: -7px;
-    -unity-slice-scale: 1;
+    -unity-slice-scale: 1px;
 }
 
 .search-history-popup > .theme-shadow {
