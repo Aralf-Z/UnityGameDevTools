@@ -1,0 +1,6 @@
+{
+  "name": "Sanmon.SurvivorDemo",
+  "rootNamespace": "Sanmon.SurvivorDemo",
+  "references": ["GameDevTools.Runtime"],
+  "autoReferenced": true
+}

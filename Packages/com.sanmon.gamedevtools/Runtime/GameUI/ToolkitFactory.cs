@@ -11,17 +11,17 @@ namespace GameConsole.UI
     [Preserve]
     public static partial class ToolkitFactory
     {
-        private const string _catalogPath = "Schema";
+        private const string _catalogPath = "Style";
 
-        private const string _sharedRoot = "Style/Shared/";
+        private const string _sharedRoot = "UIStyle/Shared/";
 
         /// <summary> 当前已提交的风格资源路径, 准备中的选择不会改变此值. </summary>
-        public static string ActiveStyle { get; private set; } = string.Empty;
+        public static string ActiveUIStyle { get; private set; } = string.Empty;
 
         /// <summary> 当前已提交的字体键, 准备中的选择不会改变此值. </summary>
         public static string ActiveFont { get; private set; } = string.Empty;
 
-        internal static IReadOnlyList<ToolkitStyleEntry> Styles => _styles;
+        internal static IReadOnlyList<ToolkitUIStyleEntry> UIStyles => _uiStyles;
 
         internal static IReadOnlyList<ToolkitFontEntry> Fonts => _externalFonts.Count == 0
             ? _fonts
@@ -42,9 +42,9 @@ namespace GameConsole.UI
 
         private static StyleSheet _controlsSheet;
 
-        private static ToolkitStyleEntry[] _styles = Array.Empty<ToolkitStyleEntry>();
+        private static ToolkitUIStyleEntry[] _uiStyles = Array.Empty<ToolkitUIStyleEntry>();
 
-        private static StyleSheet _styleSheet;
+        private static StyleSheet _uiStyleSheet;
 
         private static ToolkitFontEntry[] _fonts = Array.Empty<ToolkitFontEntry>();
 
@@ -56,26 +56,23 @@ namespace GameConsole.UI
         {
             if (!Application.isPlaying || owner == null) return null;
 
-            var catalog = Resources.Load<Schema>(_catalogPath);
+            var catalog = ToolkitResources.Load<Style>(_catalogPath);
 
-            _styles = BuildStyles(catalog?.styles);
+            _uiStyles = BuildUIStyles(catalog?.uiStyles);
             _fonts = BuildFonts(catalog?.fonts);
             ToolkitLocalization.Initialize(catalog?.languages, Config.UILanguage);
             if (string.IsNullOrEmpty(ToolkitLocalization.ActiveLanguage))
             {
-                throw new InvalidOperationException(ToolkitLocalization.Get("schema.languages.unavailable", "Schema.languages has no loadable language package."));
+                throw new InvalidOperationException(ToolkitLocalization.Get("style.languages.unavailable", "Style.languages has no loadable language package."));
             }
 
             LoadSharedResources(out var tree, out var theme, out var settings);
-            if (!TryLoadInitialStyle(Config.UIStyle, out var selected, out var sheet))
+            if (!TryLoadInitialUIStyle(Config.UIStyle, out var selected, out var sheet))
             {
-                throw new InvalidOperationException(ToolkitLocalization.Get("schema.styles.unavailable"));
+                throw new InvalidOperationException(ToolkitLocalization.Get("style.uiStyles.unavailable"));
             }
 
-            if (!LoadFont(Config.UIFont))
-            {
-                throw new InvalidOperationException(ToolkitLocalization.Get("schema.fonts.unavailable"));
-            }
+            LoadFont(Config.UIFont);
 
             var languageChanged = Config.UILanguage != ToolkitLocalization.ActiveLanguage;
             var saveFont = !Config.IsExternalFont(Config.UIFont) && Config.UIFont != ActiveFont;
@@ -92,8 +89,8 @@ namespace GameConsole.UI
                 Config.Save();
             }
 
-            ActiveStyle = selected;
-            _styleSheet = sheet;
+            ActiveUIStyle = selected;
+            _uiStyleSheet = sheet;
             InitializeAppearanceCache(sheet);
             GameObject window = null;
             PanelSettings instance = null;
@@ -146,7 +143,7 @@ namespace GameConsole.UI
         {
             if (_templates.TryGetValue(name, out var cached) && cached != null) return cached;
 
-            var template = Resources.Load<VisualTreeAsset>(_sharedRoot + name);
+            var template = ToolkitResources.Load<VisualTreeAsset>(_sharedRoot + name);
 
             if (template == null)
             {
@@ -157,32 +154,32 @@ namespace GameConsole.UI
             return template;
         }
 
-        /// <summary> 优先保留有效的保存选择, 未设置或未登记时使用 Schema 列表首项. </summary>
-        internal static string ResolveStylePath(string path)
+        /// <summary> 优先保留有效的保存选择, 未设置或未登记时使用 Style 列表首项. </summary>
+        internal static string ResolveUIStylePath(string path)
         {
-            path = NormalizeStylePath(path);
-            return _styles.Any(style => style.path == path)
+            path = NormalizeResourcePath(path);
+            return _uiStyles.Any(style => style.path == path)
                 ? path
-                : _styles.FirstOrDefault()?.path ?? string.Empty;
+                : _uiStyles.FirstOrDefault()?.path ?? string.Empty;
         }
 
-        internal static string GetStyleName(string path)
+        internal static string GetUIStyleName(string path)
         {
-            var selected = ResolveStylePath(path);
-            var entry = _styles.FirstOrDefault(style => style.path == selected);
+            var selected = ResolveUIStylePath(path);
+            var entry = _uiStyles.FirstOrDefault(style => style.path == selected);
 
             return entry?.name ?? string.Empty;
         }
 
         /// <summary> 只建立配置中的独立快照, 保留首项作为默认, 不补入固定风格. </summary>
-        internal static ToolkitStyleEntry[] BuildStyles(IEnumerable<ToolkitStyleEntry> source)
+        internal static ToolkitUIStyleEntry[] BuildUIStyles(IEnumerable<ToolkitUIStyleEntry> source)
         {
-            var result = new List<ToolkitStyleEntry>();
+            var result = new List<ToolkitUIStyleEntry>();
             var paths = new HashSet<string>(StringComparer.Ordinal);
 
-            foreach (var entry in source ?? Array.Empty<ToolkitStyleEntry>())
+            foreach (var entry in source ?? Array.Empty<ToolkitUIStyleEntry>())
             {
-                var path = NormalizeStylePath(entry?.path);
+                var path = NormalizeResourcePath(entry?.path);
 
                 if (path == null || !paths.Add(path))
                 {
@@ -193,7 +190,7 @@ namespace GameConsole.UI
                     ? path.Substring(path.LastIndexOf('/') + 1)
                     : entry.name.Trim();
 
-                result.Add(new ToolkitStyleEntry { name = name, path = path });
+                result.Add(new ToolkitUIStyleEntry { name = name, path = path });
             }
 
             return result.ToArray();
@@ -207,7 +204,7 @@ namespace GameConsole.UI
 
             foreach (var entry in source ?? Array.Empty<ToolkitFontEntry>())
             {
-                var path = NormalizeStylePath(entry?.path);
+                var path = NormalizeResourcePath(entry?.path);
 
                 if (path == null || !path.StartsWith("Font/", StringComparison.Ordinal) || path.Length <= 5 || System.IO.Path.HasExtension(path) || !paths.Add(path))
                 {
@@ -233,7 +230,7 @@ namespace GameConsole.UI
                     : _fonts.FirstOrDefault()?.path ?? string.Empty;
             }
 
-            path = NormalizeStylePath(path);
+            path = NormalizeResourcePath(path);
             return _fonts.Any(entry => entry.path == path)
                 ? path
                 : _fonts.FirstOrDefault()?.path ?? string.Empty;
@@ -241,6 +238,8 @@ namespace GameConsole.UI
 
         internal static string GetFontName(string path)
         {
+            if (string.IsNullOrEmpty(path)) return ToolkitLocalization.Get("ui.Options.uiFontName.text");
+
             var selected = ResolveFontPath(path);
             if (Config.IsExternalFont(selected)) return selected.Substring(Config.EXTERNAL_FONT_PREFIX.Length);
 
@@ -268,11 +267,11 @@ namespace GameConsole.UI
             _sharedPanel = null;
             _layoutSheet = null;
             _controlsSheet = null;
-            _styleSheet = null;
-            _styles = Array.Empty<ToolkitStyleEntry>();
+            _uiStyleSheet = null;
+            _uiStyles = Array.Empty<ToolkitUIStyleEntry>();
             _fonts = Array.Empty<ToolkitFontEntry>();
             _font = null;
-            ActiveStyle = string.Empty;
+            ActiveUIStyle = string.Empty;
             ActiveFont = string.Empty;
             _templates.Clear();
             _fontCache.Clear();
@@ -286,10 +285,21 @@ namespace GameConsole.UI
 
         internal static void ApplyFont(VisualElement root)
         {
-            if (_font == null || root == null) return;
+            ApplyFont(root, _font);
+        }
 
-            root.style.unityFont = _font;
-            var asset = ToolkitRuntimeFonts.Get(_font);
+        private static void ApplyFont(VisualElement root, Font source)
+        {
+            if (root == null) return;
+            if (source == null)
+            {
+                root.style.unityFont = StyleKeyword.Null;
+                root.style.unityFontDefinition = StyleKeyword.Null;
+                return;
+            }
+
+            root.style.unityFont = source;
+            var asset = ToolkitRuntimeFonts.Get(source);
 
             root.style.unityFontDefinition = FontDefinition.FromSDFFont(asset);
         }
@@ -318,12 +328,12 @@ namespace GameConsole.UI
             return ToolkitRuntimeFonts.Revision;
         }
 
-        // 先尝试保存选择, 失败后仅从 Schema 首项依次查找可用风格.
-        private static bool TryLoadInitialStyle(string preferred, out string selected, out StyleSheet sheet)
+        // 先尝试保存选择, 失败后仅从 Style 首项依次查找可用风格.
+        private static bool TryLoadInitialUIStyle(string preferred, out string selected, out StyleSheet sheet)
         {
-            foreach (var path in CandidatePaths(ResolveStylePath(preferred), _styles.Select(entry => entry.path)))
+            foreach (var path in CandidatePaths(ResolveUIStylePath(preferred), _uiStyles.Select(entry => entry.path)))
             {
-                sheet = Resources.Load<StyleSheet>(path + "/GameDevToolStyles");
+                sheet = ToolkitResources.Load<StyleSheet>(path + "/GameDevToolUIStyles");
                 if (sheet == null)
                 {
                     continue;
@@ -349,38 +359,46 @@ namespace GameConsole.UI
             tree = RequireTemplate("GameDevTool");
             if (_sharedTheme == null)
             {
-                _sharedTheme = Resources.Load<ThemeStyleSheet>(_sharedRoot + "GameDevToolTheme");
+                _sharedTheme = ToolkitResources.Load<ThemeStyleSheet>(_sharedRoot + "GameDevToolTheme");
             }
 
             if (_sharedPanel == null)
             {
-                _sharedPanel = Resources.Load<PanelSettings>(_sharedRoot + "GameDevToolPanel");
+                _sharedPanel = ToolkitResources.Load<PanelSettings>(_sharedRoot + "GameDevToolPanel");
             }
 
             if (_layoutSheet == null)
             {
-                _layoutSheet = Resources.Load<StyleSheet>(_sharedRoot + "GameDevToolLayout");
+                _layoutSheet = ToolkitResources.Load<StyleSheet>(_sharedRoot + "GameDevToolLayout");
             }
 
             if (_controlsSheet == null)
             {
-                _controlsSheet = Resources.Load<StyleSheet>(_sharedRoot + "ToolkitControls");
+                _controlsSheet = ToolkitResources.Load<StyleSheet>(_sharedRoot + "ToolkitControls");
             }
 
             theme = _sharedTheme;
             settings = _sharedPanel;
             if (theme == null || settings == null || _layoutSheet == null || _controlsSheet == null)
             {
-                throw new InvalidOperationException(ToolkitLocalization.Get("schema.styles.unavailable"));
+                throw new InvalidOperationException(ToolkitLocalization.Get("style.uiStyles.unavailable"));
             }
         }
 
-        // 优先所选字体, 缺失时按 Schema 顺序尝试内置字体.
-        private static bool LoadFont(string selected)
+        // 优先所选字体, 缺失时按 Style 顺序尝试内置字体.
+        private static void LoadFont(string selected)
         {
-            foreach (var path in CandidatePaths(ResolveFontPath(selected), _fonts.Select(entry => entry.path)))
+            foreach (var path in FontCandidates(selected))
             {
-                var font = Config.IsExternalFont(path) ? _externalFonts[path] : Resources.Load<Font>(path);
+                Font font;
+                if (Config.IsExternalFont(path))
+                {
+                    _externalFonts.TryGetValue(path, out font);
+                }
+                else
+                {
+                    font = ToolkitResources.Load<Font>(path);
+                }
 
                 if (font == null)
                 {
@@ -389,13 +407,15 @@ namespace GameConsole.UI
 
                 _font = font;
                 ActiveFont = path;
-                return true;
+                return;
             }
 
             _font = null;
             ActiveFont = string.Empty;
-            return false;
         }
+
+        private static IEnumerable<string> FontCandidates(string selected) => CandidatePaths(ResolveFontPath(selected), _fonts.Select(entry => entry.path)
+            .Concat(_externalFonts.Where(entry => entry.Value != null).Select(entry => entry.Key)));
 
         // 所选项优先, 失败后从配置首项开始, 每个路径只尝试一次且不引入固定后备.
         private static IEnumerable<string> CandidatePaths(string selected, IEnumerable<string> configured) => new[]
@@ -403,7 +423,7 @@ namespace GameConsole.UI
             .Where(path => !string.IsNullOrEmpty(path))
             .Distinct(StringComparer.Ordinal);
 
-        private static string NormalizeStylePath(string path)
+        private static string NormalizeResourcePath(string path)
         {
             if (string.IsNullOrWhiteSpace(path)) return null;
 

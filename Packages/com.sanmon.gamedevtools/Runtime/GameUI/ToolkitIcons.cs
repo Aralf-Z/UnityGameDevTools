@@ -37,22 +37,22 @@ namespace GameConsole.UI
         /// <summary> 使用已提交风格, 缺失时回退 Shared, 两处均缺失返回 null. </summary>
         internal static Sprite Load(string key)
         {
-            var folder = ToolkitFactory.ActiveStyle ?? string.Empty;
+            var folder = ToolkitFactory.ActiveUIStyle ?? string.Empty;
 
-            if (folder.StartsWith("Style/", StringComparison.Ordinal))
+            if (folder.StartsWith("UIStyle/", StringComparison.Ordinal))
             {
-                folder = folder.Substring("Style/".Length);
+                folder = folder.Substring("UIStyle/".Length);
             }
 
             var path = ICON_ROOT + folder + "/" + key;
 
             if (_cache.TryGetValue(path, out var cached)) return cached;
 
-            var sprite = Resources.Load<Sprite>(path);
+            var sprite = ToolkitResources.Load<Sprite>(path);
 
             if (sprite == null)
             {
-                sprite = Resources.Load<Sprite>(ICON_ROOT + "Shared/" + key);
+                sprite = ToolkitResources.Load<Sprite>(ICON_ROOT + "Shared/" + key);
             }
 
             _cache[path] = sprite;

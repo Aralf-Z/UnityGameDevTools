@@ -18,7 +18,7 @@ namespace GameConsole.UI
             if (root == null) return null;
 
             root.AddToClassList("context-menu-root");
-            foreach (var sheet in new[] { _layoutSheet, _styleSheet, _controlsSheet })
+            foreach (var sheet in new[] { _layoutSheet, _uiStyleSheet, _controlsSheet })
             {
                 if (sheet != null)
                 {

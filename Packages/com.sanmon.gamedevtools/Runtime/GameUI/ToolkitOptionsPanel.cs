@@ -60,7 +60,7 @@ namespace GameConsole.UI
             BindInteger(root, "cheatSearchHistoryCapacity", () => Config.CheatSearchHistoryCapacity, value => Config.CheatSearchHistoryCapacity = value, Config.MIN_CHEAT_SEARCH_HISTORY_CAPACITY, Config.MAX_CHEAT_SEARCH_HISTORY_CAPACITY, true);
             BindPanelOpacity(root, windowSettings);
             BindWheelScrollSensitivity(root, windowSettings);
-            BindStyle(root);
+            BindUIStyle(root);
             BindFont(root);
             BindLanguage(root);
             BindShortcut(root);
@@ -202,7 +202,7 @@ namespace GameConsole.UI
             _refresh.Add(refresh);
         }
 
-        private void BindStyle(VisualElement root)
+        private void BindUIStyle(VisualElement root)
         {
             var field = ToolkitView.Require<Button>(root, "uiStyle");
             var title = ToolkitView.Require<Label>(root, "uiStyleName");
@@ -211,7 +211,7 @@ namespace GameConsole.UI
             title.enableRichText = false;
             title.parseEscapeSequences = false;
             _text.Track(title);
-            Action refresh = () => _text.SetText(title, ToolkitFactory.GetStyleName(Config.UIStyle));
+            Action refresh = () => _text.SetText(title, ToolkitFactory.GetUIStyleName(Config.UIStyle));
 
             refresh();
             Action click = () =>
@@ -226,10 +226,10 @@ namespace GameConsole.UI
 
                 _styleMenu ??= new ToolkitDropdownPopup(field, field, Config.SELECTOR_VISIBLE_ITEMS);
                 CloseSelectionMenus();
-                var styles = ToolkitFactory.Styles;
-                var names = new List<string>(styles.Count);
+                var uiStyles = ToolkitFactory.UIStyles;
+                var names = new List<string>(uiStyles.Count);
 
-                foreach (var entry in styles)
+                foreach (var entry in uiStyles)
                 {
                     names.Add(entry.name);
                 }
@@ -238,7 +238,7 @@ namespace GameConsole.UI
                 {
                     if (!_visible || _appearance.IsChanging) return;
 
-                    _appearance.RequestStyle(styles[index].path);
+                    _appearance.RequestUIStyle(uiStyles[index].path);
                 });
             };
 
@@ -273,6 +273,8 @@ namespace GameConsole.UI
                 _fontMenu ??= new ToolkitDropdownPopup(field, field, Config.SELECTOR_VISIBLE_ITEMS);
                 CloseSelectionMenus();
                 var fonts = ToolkitFactory.Fonts;
+                if (fonts.Count == 0) return;
+
                 var names = new List<string>(fonts.Count);
 
                 foreach (var entry in fonts)

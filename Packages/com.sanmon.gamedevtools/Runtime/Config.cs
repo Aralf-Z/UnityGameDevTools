@@ -365,7 +365,7 @@ namespace GameConsole
             return name.Length == 0 ? string.Empty : EXTERNAL_FONT_PREFIX + name;
         }
 
-        // 资源选择和失效回退由 Schema 处理, 此处仅规范路径格式.
+        // 资源选择和失效回退由 Style 处理, 此处仅规范路径格式.
         private static string NormalizeResourcePath(string value) => string.IsNullOrWhiteSpace(value)
             ? string.Empty
             : value.Trim().Replace('\\', '/');

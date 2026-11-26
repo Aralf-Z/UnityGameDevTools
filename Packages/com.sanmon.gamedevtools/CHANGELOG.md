@@ -10,6 +10,9 @@
 
 ### Changed
 
+- Schema 改名为 Style；界面样式统一命名为 UIStyle，不保留旧名称兼容。
+- 默认资源集中为不导入的 DefaultResources~ 模板，首次打开项目时复制到 Assets/Resources/Sanmon/GameDevTools，模板源不进入 Player。
+- 移除自动资源追加，已有 Style 仅对空 UI 样式和语言列表警告；首次使用 MapleMono，支持外部字体和完全无字体时使用 UI Toolkit 默认字体。
 - 移除 UniTask 兼容及依赖，宏执行改用标准 Task 与 Unity 协程。
 - 同步中英文宏语法说明、帮助文案、诊断字段和安装说明。
 - 保留 Task、Task<T>、IEnumerator 等待、非缩放时间延迟与取消行为，新增宏执行回归测试。
@@ -28,6 +31,6 @@
 - 将源码与资源整理到 Runtime 和 Editor，保留原有资源 GUID。
 - 将 Unity 开发工程迁至 `Samples~/DevelopmentProject`，本地引用仓库根包。
 - 命令扫描支持使用方运行时程序集。
-- Schema 更新器自动定位包目录，避免修改 Git/Registry 包缓存。
+- Style 更新器自动定位包目录，避免修改 Git/Registry 包缓存。
 
 本版本尚未提交或推送到远程，也未创建 Git 版本标签。

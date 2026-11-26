@@ -11,8 +11,8 @@
 
 ## Maple Mono
 
-- 位置：`Runtime/GameUI/Resources/Font/MapleMono-Light.ttf`。
+- 位置：`DefaultResources~/Font/MapleMono-Light.ttf`，初始化后位于项目 `Assets/Resources/Sanmon/GameDevTools/Font`。
 - Copyright 2022 The Maple Mono Project Authors。
 - 上游：https://github.com/subframe7536/maple-font 。
-- 许可：SIL Open Font License 1.1，全文随包保留在 `Runtime/GameUI/Resources/Font/Notices/MapleMono-LICENSE.txt`。
+- 许可：SIL Open Font License 1.1，全文随模板保留在 `DefaultResources~/Font/Notices/MapleMono-LICENSE.txt`，并随字体复制到项目。
 

@@ -57,15 +57,19 @@ public static class GameCommands
 
 设置、宏和输入历史统一保存在 `Application.persistentDataPath/development_data.json`，不写入 UPM 包。Inspector 中显示实际路径并提供打开按钮。
 
-主题、字体、图标和语言资源位于 `Runtime/GameUI/Resources`。Git 安装使用随包提供的 `Schema.asset`；修改资源时使用本地包或嵌入式包，避免直接编辑 `Library/PackageCache`。运行时自定义字体可通过控制器的 `RegisterFont` 注册。
+项目打开时，若 `Assets/Resources/Sanmon/GameDevTools/Style.asset` 不存在，初始化器将包内 `DefaultResources~` 的默认资源复制到该目录。模板保留用于初始化和参考，Unity 不导入模板源，Player 只使用项目副本；本地、Git 和 Registry 包采用相同流程。已有文件不会被覆盖，已有 Style 的 `uiStyles` 或 `languages` 列表为空时仅输出警告，不自动登记或补齐资源。
+
+Style 的 `uiStyles`、`fonts`、`languages` 手动维护名称、顺序和相对工具资源根目录的路径，例如 `UIStyle/Terminal`、`Font/MapleMono-Light`、`Localization/zh`。首个可加载项作为默认；首次使用默认模板中的 MapleMono 字体，已有有效选择优先。完全无可用字体时使用 UI Toolkit 默认字体。运行时自定义字体通过控制器的 `RegisterFont` 注册；已保存的外部字体在稍后注册时恢复。
 
 ## 仓库目录
 
 ```text
 package.json                  UPM 包清单
-Runtime/                      运行时代码与 Resources
-Editor/                       Inspector 与 Schema 更新器
-Tests/Editor/                 包兼容与跨程序集回归测试
+Runtime/                      运行时代码
+Editor/                       Inspector 与 Style 初始化器
+DefaultResources~/            不导入的初始化参考模板，不进入 Player 构建
+Tests/Editor/                 Style 初始化、引用和资源隔离回归测试
+Tests/Runtime/                UI 创建、字体选择与切换回归测试
 Documentation~/               使用说明、开发指南、编码规范
 
 CHANGELOG.md                  版本记录

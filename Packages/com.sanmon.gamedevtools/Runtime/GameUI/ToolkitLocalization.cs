@@ -18,7 +18,7 @@ namespace GameConsole
 
         private static readonly HashSet<string> _reported = new(StringComparer.Ordinal);
 
-        private static ToolkitLanguageEntry[] _languages = Array.Empty<ToolkitLanguageEntry>(); // 默认入口仅由 Schema 的排列决定.
+        private static ToolkitLanguageEntry[] _languages = Array.Empty<ToolkitLanguageEntry>(); // 默认入口仅由 Style 的排列决定.
 
         private static ToolkitLanguagePack _active;
 
@@ -71,7 +71,7 @@ namespace GameConsole
 
             if (_fallback == null)
             {
-                Report("bootstrap", "Schema.languages has no loadable language package.");
+                Report("bootstrap", "Style.languages has no loadable language package.");
                 _fallback = new ToolkitLanguagePack(string.Empty, new());
             }
 
@@ -194,7 +194,7 @@ namespace GameConsole
                 yield break;
             }
 
-            throw new InvalidOperationException("Schema.languages has no loadable language package.", failure);
+            throw new InvalidOperationException("Style.languages has no loadable language package.", failure);
         }
 
         // 单包完成解析与校验后才返回, 调用者负责按列表顺序回退.
@@ -204,7 +204,7 @@ namespace GameConsole
             code = Resolve(code);
             if (string.IsNullOrEmpty(code))
             {
-                throw new InvalidOperationException("Schema.languages has no loadable language package.");
+                throw new InvalidOperationException("Style.languages has no loadable language package.");
             }
 
             yield return null;
@@ -215,7 +215,7 @@ namespace GameConsole
             }
 
             var entry = _languages.First(language => language.code == code);
-            var requests = _modules.Select(module => Resources.LoadAsync<TextAsset>(entry.path + "/" + module))
+            var requests = _modules.Select(module => ToolkitResources.LoadAsync<TextAsset>(entry.path + "/" + module))
                 .ToArray();
             var values = new Dictionary<string, string>(StringComparer.Ordinal);
 
@@ -296,7 +296,7 @@ namespace GameConsole
         {
             if (_active != null) return;
 
-            Initialize(Resources.Load<Schema>("Schema")?.languages, Config.UILanguage);
+            Initialize(ToolkitResources.Load<Style>("Style")?.languages, Config.UILanguage);
         }
 
         // 同步读取仅用于工具首次初始化, 后续切换全部走异步准备.
@@ -307,7 +307,7 @@ namespace GameConsole
             foreach (var module in _modules)
             {
                 var source = entry.path + "/" + module;
-                var asset = Resources.Load<TextAsset>(source);
+                var asset = ToolkitResources.Load<TextAsset>(source);
 
                 if (asset == null)
                 {

@@ -10,7 +10,7 @@ namespace GameConsole.UI
     /// <summary> 已准备完成的主题资源, 提交前不改变界面或配置. </summary>
     internal sealed class ToolkitAppearanceResources
     {
-        internal readonly string style;
+        internal readonly string uiStyle;
 
         internal readonly string fontPath;
 
@@ -18,9 +18,9 @@ namespace GameConsole.UI
 
         internal readonly StyleSheet sheet;
 
-        internal ToolkitAppearanceResources(string style, string fontPath, Font font, StyleSheet sheet)
+        internal ToolkitAppearanceResources(string uiStyle, string fontPath, Font font, StyleSheet sheet)
         {
-            this.style = style;
+            this.uiStyle = uiStyle;
             this.fontPath = fontPath;
             this.font = font;
             this.sheet = sheet;
@@ -29,7 +29,7 @@ namespace GameConsole.UI
 
     public static partial class ToolkitFactory
     {
-        private const string _mainSheetName = "GameDevToolStyles"; // 工厂挂载的风格外观入口, 其他样式保留原位.
+        private const string _mainSheetName = "GameDevToolUIStyles"; // 工厂挂载的风格外观入口, 其他样式保留原位.
 
         private const string _layoutSheetName = "GameDevToolLayout"; // 公共模板的布局标记, 外观必须在其后挂载.
 
@@ -76,7 +76,7 @@ namespace GameConsole.UI
 
             Font loadedFont = null;
 
-            foreach (var path in CandidatePaths(ResolveFontPath(font), _fonts.Select(entry => entry.path)))
+            foreach (var path in FontCandidates(font))
             {
                 _fontCache.TryGetValue(path, out loadedFont);
                 if (Config.IsExternalFont(path))
@@ -85,7 +85,7 @@ namespace GameConsole.UI
                 }
                 else if (loadedFont == null)
                 {
-                    var request = Resources.LoadAsync<Font>(path);
+                    var request = ToolkitResources.LoadAsync<Font>(path);
 
                     while (!request.isDone)
                     {
@@ -107,15 +107,15 @@ namespace GameConsole.UI
 
             if (loadedFont == null)
             {
-                throw new InvalidOperationException(ToolkitLocalization.Get("schema.fonts.unavailable"));
+                font = string.Empty;
             }
 
             Exception failure = null;
 
-            foreach (var path in CandidatePaths(ResolveStylePath(style), _styles.Select(entry => entry.path)))
+            foreach (var path in CandidatePaths(ResolveUIStylePath(style), _uiStyles.Select(entry => entry.path)))
             {
                 ToolkitAppearanceResources prepared = null;
-                var work = PrepareAppearanceCandidate(path, font, value => prepared = value);
+                var work = PrepareAppearanceCandidate(path, font, loadedFont, value => prepared = value);
                 using var lifetime = work as IDisposable;
 
                 while (true)
@@ -154,27 +154,21 @@ namespace GameConsole.UI
                 yield break;
             }
 
-            throw new InvalidOperationException(ToolkitLocalization.Get("schema.styles.unavailable"), failure);
+            throw new InvalidOperationException(ToolkitLocalization.Get("style.uiStyles.unavailable"), failure);
         }
 
         // 仅准备风格外观与字体, 公共模板和面板不参与切换.
-        private static IEnumerator PrepareAppearanceCandidate(string style, string font, Action<ToolkitAppearanceResources> ready)
+        private static IEnumerator PrepareAppearanceCandidate(string style, string font, Font loadedFont, Action<ToolkitAppearanceResources> ready)
         {
             if (ready == null)
             {
                 throw new ArgumentNullException(nameof(ready));
             }
 
-            style = NormalizeStylePath(style);
-            font = Config.IsExternalFont(font) ? font : NormalizeStylePath(font);
-            if (style == null || !_styles.Any(entry => entry.path == style))
+            style = NormalizeResourcePath(style);
+            if (style == null || !_uiStyles.Any(entry => entry.path == style))
             {
                 throw new InvalidOperationException(ToolkitLocalization.Get("ui.Factory_Appearance.PrepareAppearance"));
-            }
-
-            if (font == null || ResolveFontPath(font) != font)
-            {
-                throw new InvalidOperationException(ToolkitLocalization.Get("ui.Factory_Appearance.PrepareAppearance.2"));
             }
 
             yield return null;
@@ -182,26 +176,13 @@ namespace GameConsole.UI
             var prefix = style + "/";
             var sheetRequest = cached?.sheet != null
                 ? null
-                : Resources.LoadAsync<StyleSheet>(prefix + "GameDevToolStyles");
+                : ToolkitResources.LoadAsync<StyleSheet>(prefix + "GameDevToolUIStyles");
 
-            _fontCache.TryGetValue(font, out var loadedFont);
-            if (font == ActiveFont && _font != null)
+            if (sheetRequest != null)
             {
-                loadedFont = _font;
-            }
-
-            var fontRequest = loadedFont != null || Config.IsExternalFont(font)
-                ? null
-                : Resources.LoadAsync<Font>(font);
-
-            foreach (var request in new[] { sheetRequest, fontRequest })
-            {
-                if (request != null)
+                while (!sheetRequest.isDone)
                 {
-                    while (!request.isDone)
-                    {
-                        yield return request;
-                    }
+                    yield return sheetRequest;
                 }
             }
 
@@ -209,25 +190,15 @@ namespace GameConsole.UI
                 ? cached.sheet
                 : sheetRequest.asset as StyleSheet;
 
-            if (fontRequest != null)
-            {
-                loadedFont = fontRequest.asset as Font;
-            }
-
             if (sheet == null)
             {
                 throw new InvalidOperationException(ToolkitLocalization.Format("ui.Factory_Appearance.PrepareAppearance.4", ("p0", (object)(style))));
             }
 
-            if (loadedFont == null)
-            {
-                throw new InvalidOperationException(ToolkitLocalization.Format("ui.Factory_Appearance.PrepareAppearance.5", ("p0", (object)(font))));
-            }
-
             var prepared = new ToolkitAppearanceResources(style, font, loadedFont, sheet);
 
             _appearanceCache[style] = prepared;
-            _fontCache[font] = loadedFont;
+            if (loadedFont != null) _fontCache[font] = loadedFont;
             ready(prepared);
         }
 
@@ -238,7 +209,7 @@ namespace GameConsole.UI
                 throw new ArgumentNullException(ToolkitLocalization.Get("ui.Factory_Appearance.CommitAppearance"));
             }
 
-            if (prepared.sheet == null || prepared.font == null)
+            if (prepared.sheet == null)
             {
                 throw new InvalidOperationException(ToolkitLocalization.Get("ui.Factory_Appearance.CommitAppearance.2"));
             }
@@ -247,8 +218,6 @@ namespace GameConsole.UI
             var fonts = new List<FontSnapshot>();
             var roots = new List<VisualElement>
             { root };
-            var fontAsset = ToolkitRuntimeFonts.Get(prepared.font);
-
             for (var i = _menuRoots.Count - 1; i >= 0; i--)
             {
                 if (!_menuRoots[i].TryGetTarget(out var menu))
@@ -269,8 +238,7 @@ namespace GameConsole.UI
                 {
                     fonts.Add(new FontSnapshot(target));
                     NormalizeThemeSheets(target, prepared.sheet, sheets);
-                    target.style.unityFont = prepared.font;
-                    target.style.unityFontDefinition = FontDefinition.FromSDFFont(fontAsset);
+                    ApplyFont(target, prepared.font);
                 }
             }
             catch
@@ -288,11 +256,11 @@ namespace GameConsole.UI
                 throw;
             }
 
-            ActiveStyle = prepared.style;
+            ActiveUIStyle = prepared.uiStyle;
             ActiveFont = prepared.fontPath;
-            _styleSheet = prepared.sheet;
+            _uiStyleSheet = prepared.sheet;
             _font = prepared.font;
-            _appearanceCache[prepared.style] = prepared;
+            _appearanceCache[prepared.uiStyle] = prepared;
             AppearanceVersion++;
             ToolkitIcons.RefreshWindowResize(root);
             ToolkitLocalization.RefreshPresentation();
@@ -318,9 +286,9 @@ namespace GameConsole.UI
         /// <summary> 只替换节点直接挂载的主题主样式, 保留无关表及其顺序. </summary>
         internal static void NormalizeThemeSheets(VisualElement root)
         {
-            if (root != null && _styleSheet != null)
+            if (root != null && _uiStyleSheet != null)
             {
-                NormalizeThemeSheets(root, _styleSheet, null);
+                NormalizeThemeSheets(root, _uiStyleSheet, null);
             }
         }
 
@@ -329,7 +297,7 @@ namespace GameConsole.UI
         {
             _appearanceCache.Clear();
             _fontCache.Clear();
-            _appearanceCache[ActiveStyle] = new ToolkitAppearanceResources(ActiveStyle, ActiveFont, _font, sheet);
+            _appearanceCache[ActiveUIStyle] = new ToolkitAppearanceResources(ActiveUIStyle, ActiveFont, _font, sheet);
             if (_font != null)
             {
                 _fontCache[ActiveFont] = _font;

@@ -39,7 +39,7 @@ namespace GameConsole.UI
             _panel = panel;
         }
 
-        internal bool RequestStyle(string path) => Request(path, ToolkitFactory.ActiveFont);
+        internal bool RequestUIStyle(string path) => Request(path, ToolkitFactory.ActiveFont);
 
         internal bool RequestFont(string path)
         {
@@ -48,7 +48,7 @@ namespace GameConsole.UI
             var selected = ToolkitFactory.ResolveFontPath(path);
             if (Config.IsExternalFont(path) && selected != path) return false;
 
-            if (selected != ToolkitFactory.ActiveFont) return Request(ToolkitFactory.ActiveStyle, selected, selected);
+            if (selected != ToolkitFactory.ActiveFont) return Request(ToolkitFactory.ActiveUIStyle, selected, selected);
 
             if (Config.UIFont == selected) return false;
 
@@ -90,7 +90,7 @@ namespace GameConsole.UI
                 _registeredFontToRestore = null;
                 if (Config.UIFont == key)
                 {
-                    Request(ToolkitFactory.ActiveStyle, key);
+                    Request(ToolkitFactory.ActiveUIStyle, key);
                 }
             }
 
@@ -139,7 +139,7 @@ namespace GameConsole.UI
                 committed = true;
                 _prepared = null;
                 _preparedLanguage = null;
-                Config.UIStyle = ToolkitFactory.ActiveStyle;
+                Config.UIStyle = ToolkitFactory.ActiveUIStyle;
                 if (_fontToSave == ToolkitFactory.ActiveFont || !Config.IsExternalFont(Config.UIFont))
                 {
                     Config.UIFont = ToolkitFactory.ActiveFont;
@@ -173,9 +173,9 @@ namespace GameConsole.UI
         {
             if (_disposed || IsChanging) return false;
 
-            style = ToolkitFactory.ResolveStylePath(style);
+            style = ToolkitFactory.ResolveUIStylePath(style);
             font = ToolkitFactory.ResolveFontPath(font);
-            if (style == ToolkitFactory.ActiveStyle && font == ToolkitFactory.ActiveFont) return false;
+            if (style == ToolkitFactory.ActiveUIStyle && font == ToolkitFactory.ActiveFont) return false;
 
             _prepared = null;
             _preparedLanguage = null;
