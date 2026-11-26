@@ -1,0 +1,7 @@
+{
+  "name": "GameDevTools.Editor",
+  "rootNamespace": "GameConsole.Editor",
+  "references": ["GameDevTools.Runtime"],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": true
+}

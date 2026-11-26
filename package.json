@@ -1,0 +1,16 @@
+{
+  "name": "com.sanmon.gamedevtools",
+  "version": "0.1.0",
+  "displayName": "Game Dev Tools",
+  "description": "基于 UI Toolkit 的 Unity 游戏开发控制台, 支持命令补全、调试参数、宏、日志、主题与中英文本地化。",
+  "unity": "2022.3",
+  "license": "MIT",
+  "author": { "name": "Aralf", "url": "https://github.com/Aralf-Z" },
+  "repository": { "type": "git", "url": "https://github.com/Aralf-Z/UnityGameDevTools.git" },
+  "keywords": ["console", "debug", "commands", "macro", "ui-toolkit"],
+  "dependencies": {
+    "com.unity.modules.uielements": "1.0.0",
+    "com.unity.modules.jsonserialize": "1.0.0",
+    "com.unity.modules.imgui": "1.0.0"
+  }
+}

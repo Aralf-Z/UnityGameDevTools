@@ -74,3 +74,19 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 /.idea
+
+# Nested Unity development project. Root rules above retain ignored local caches.
+**/[Ll]ibrary/
+**/[Tt]emp/
+**/[Oo]bj/
+**/[Ll]ogs/
+**/[Uu]ser[Ss]ettings/
+**/[Bb]uild/
+**/[Bb]uilds/
+**/[Mm]emoryCaptures/
+**/[Rr]ecordings/
+TestResults/
+*.tgz
+
+# Original local project caches, ignored by Unity because the name ends in ~.
+/LegacyProjectCache~/

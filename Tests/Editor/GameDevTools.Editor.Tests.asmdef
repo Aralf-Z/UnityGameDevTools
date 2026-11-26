@@ -1,0 +1,8 @@
+{
+  "name": "GameDevTools.Editor.Tests",
+  "rootNamespace": "GameDevTools.Tests",
+  "references": ["GameDevTools.Runtime", "GameDevTools.Editor"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "autoReferenced": false
+}

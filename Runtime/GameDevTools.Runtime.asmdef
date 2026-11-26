@@ -1,0 +1,6 @@
+{
+  "name": "GameDevTools.Runtime",
+  "rootNamespace": "GameConsole",
+  "references": [],
+  "autoReferenced": true
+}
