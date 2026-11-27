@@ -7,10 +7,11 @@ namespace Sanmon.SurvivorDemo
 {
     public enum SurvivorSkillParameter
     {
-        Cooldown, Radius, Damage, ProjectileCount, VolleyCount, VolleyInterval,
-        ProjectileSpeed, ProjectileLifetime, ProjectileSpread, OrbiterCount,
-        OrbitSpeed, BladeRotationSpeed, OrbitHeight, HitInterval, Duration,
-        TickInterval, Knockback, KnockbackDecay, HeavyKnockbackMultiplier
+        Cooldown = 0, Radius = 1, DamageMultiplier = 2, ProjectileCount = 3, VolleyCount = 4, VolleyInterval = 5,
+        ProjectileSpeed = 6, ProjectileLifetime = 7, ProjectileSpread = 8, OrbiterCount = 9,
+        OrbitSpeed = 10, BladeRotationSpeed = 11, OrbitHeight = 12, HitInterval = 13, Duration = 14,
+        TickInterval = 15, Knockback = 16, KnockbackDecay = 17, HeavyKnockbackMultiplier = 18,
+        DashSpeedMultiplier = 19, InvulnerabilityDuration = 20, Healing = 21, TargetRange = 22
     }
 
     [Serializable]
@@ -27,11 +28,13 @@ namespace Sanmon.SurvivorDemo
     [Serializable]
     public sealed class SurvivorSkillStats
     {
-        public float cooldown = 1, radius = 1, damage;
+        public float cooldown = 1, radius = 1, damageMultiplier;
         public int projectileCount = 1, volleyCount = 1, orbiterCount = 3;
         public float volleyInterval = 0.12f, projectileSpeed = 18, projectileLifetime = 1.6f, projectileSpread = 11;
         public float orbitSpeed = 2.7f, bladeRotationSpeed = 140, orbitHeight = 0.85f, hitInterval = 0.4f;
         public float duration = 2, tickInterval = 0.5f, knockback, knockbackDecay = 6, heavyKnockbackMultiplier = 0.55f;
+        public float dashSpeedMultiplier = 3.8f, invulnerabilityDuration = 0.24f, healing;
+        public float targetRange = 18;
         public string effectColor = "#FFFFFF";
         public SurvivorDebuffConfig[] debuffs = Array.Empty<SurvivorDebuffConfig>();
         [NonSerialized] public Color color;
@@ -46,7 +49,7 @@ namespace Sanmon.SurvivorDemo
         public float Get(SurvivorSkillParameter parameter) => parameter switch
         {
             SurvivorSkillParameter.Cooldown => cooldown, SurvivorSkillParameter.Radius => radius,
-            SurvivorSkillParameter.Damage => damage, SurvivorSkillParameter.ProjectileCount => projectileCount,
+            SurvivorSkillParameter.DamageMultiplier => damageMultiplier, SurvivorSkillParameter.ProjectileCount => projectileCount,
             SurvivorSkillParameter.VolleyCount => volleyCount, SurvivorSkillParameter.VolleyInterval => volleyInterval,
             SurvivorSkillParameter.ProjectileSpeed => projectileSpeed, SurvivorSkillParameter.ProjectileLifetime => projectileLifetime,
             SurvivorSkillParameter.ProjectileSpread => projectileSpread, SurvivorSkillParameter.OrbiterCount => orbiterCount,
@@ -54,7 +57,11 @@ namespace Sanmon.SurvivorDemo
             SurvivorSkillParameter.OrbitHeight => orbitHeight, SurvivorSkillParameter.HitInterval => hitInterval,
             SurvivorSkillParameter.Duration => duration, SurvivorSkillParameter.TickInterval => tickInterval,
             SurvivorSkillParameter.Knockback => knockback, SurvivorSkillParameter.KnockbackDecay => knockbackDecay,
-            SurvivorSkillParameter.HeavyKnockbackMultiplier => heavyKnockbackMultiplier, _ => 0
+            SurvivorSkillParameter.HeavyKnockbackMultiplier => heavyKnockbackMultiplier,
+            SurvivorSkillParameter.DashSpeedMultiplier => dashSpeedMultiplier,
+            SurvivorSkillParameter.InvulnerabilityDuration => invulnerabilityDuration,
+            SurvivorSkillParameter.TargetRange => targetRange,
+            SurvivorSkillParameter.Healing => healing, _ => 0
         };
 
         public void Set(SurvivorSkillParameter parameter, float value)
@@ -63,7 +70,7 @@ namespace Sanmon.SurvivorDemo
             {
                 case SurvivorSkillParameter.Cooldown: cooldown = value; break;
                 case SurvivorSkillParameter.Radius: radius = value; break;
-                case SurvivorSkillParameter.Damage: damage = value; break;
+                case SurvivorSkillParameter.DamageMultiplier: damageMultiplier = value; break;
                 case SurvivorSkillParameter.ProjectileCount: projectileCount = Mathf.RoundToInt(value); break;
                 case SurvivorSkillParameter.VolleyCount: volleyCount = Mathf.RoundToInt(value); break;
                 case SurvivorSkillParameter.VolleyInterval: volleyInterval = value; break;
@@ -80,6 +87,10 @@ namespace Sanmon.SurvivorDemo
                 case SurvivorSkillParameter.Knockback: knockback = value; break;
                 case SurvivorSkillParameter.KnockbackDecay: knockbackDecay = value; break;
                 case SurvivorSkillParameter.HeavyKnockbackMultiplier: heavyKnockbackMultiplier = value; break;
+                case SurvivorSkillParameter.DashSpeedMultiplier: dashSpeedMultiplier = value; break;
+                case SurvivorSkillParameter.InvulnerabilityDuration: invulnerabilityDuration = value; break;
+                case SurvivorSkillParameter.Healing: healing = value; break;
+                case SurvivorSkillParameter.TargetRange: targetRange = value; break;
             }
         }
     }
@@ -87,136 +98,30 @@ namespace Sanmon.SurvivorDemo
     [Serializable]
     public sealed class SurvivorSkillValueOverride
     {
-        public string parameter = "Damage";
+        public string parameter = "DamageMultiplier";
         public string operation = "Set";
         public float value;
     }
 
-    [Serializable]
-    public sealed class SurvivorSkillUpgrade
-    {
-        public bool enabled;
-        public string displayName = "预留";
-        [TextArea] public string additionalDescription = "";
-        public string effectColor = "";
-        public SurvivorSkillValueOverride[] overrides = Array.Empty<SurvivorSkillValueOverride>();
-        public SurvivorDebuffConfig[] debuffOverrides = Array.Empty<SurvivorDebuffConfig>();
-    }
-
-    [Serializable]
-    public sealed class SurvivorSkillDefinition
-    {
-        public string id;
-        public bool enabled = true;
-        public string displayName;
-        [TextArea] public string description;
-        public SurvivorSkillStats baseStats = new();
-        public SurvivorSkillUpgrade t1 = new(), t2 = new(), t3 = new();
-        public SurvivorSkillUpgrade Upgrade(int tier) => tier == 1 ? t1 : tier == 2 ? t2 : tier == 3 ? t3 : null;
-        public int MaxTier => !t1.enabled ? 0 : !t2.enabled ? 1 : !t3.enabled ? 2 : 3;
-    }
-
-    [Serializable]
-    public sealed class SurvivorSkillCatalog
-    {
-        public int version = 1;
-        public SurvivorSkillDefinition[] skills;
-        [NonSerialized] private SurvivorSkillDefinition[] _ordered;
-        [NonSerialized] private SurvivorSkillStats[][] _resolved;
-        [NonSerialized] private string[][] _descriptions;
-
-        public SurvivorSkillDefinition Get(SkillKind skill) { if (_ordered == null) Rebuild(); return _ordered[(int)skill]; }
-        public SurvivorSkillStats Resolve(SkillKind skill, int tier)
-        {
-            if (_resolved == null) Rebuild();
-            return _resolved[(int)skill][Mathf.Clamp(tier, 0, Get(skill).MaxTier)];
-        }
-
-        public string Description(SkillKind skill, int tier)
-        {
-            if (_descriptions == null) Rebuild();
-            return _descriptions[(int)skill][Mathf.Clamp(tier, 0, Get(skill).MaxTier)];
-        }
-
-        public void Rebuild()
-        {
-            if (version != 1 || skills == null || skills.Length != 4) throw new ArgumentException("技能配置版本必须为 1，并包含 Bolt、Orbit、Nova、Frost 四个技能。");
-            var ordered = new SurvivorSkillDefinition[4];
-            var resolved = new SurvivorSkillStats[4][];
-            var descriptions = new string[4][];
-            foreach (var definition in skills)
-            {
-                if (definition == null || !Enum.TryParse(definition.id, false, out SkillKind kind) || !Enum.IsDefined(typeof(SkillKind), kind))
-                    throw new ArgumentException("技能 id 必须为 Bolt、Orbit、Nova 或 Frost。");
-                var index = (int)kind;
-                if (ordered[index] != null) throw new ArgumentException("重复的技能 id：" + definition.id);
-                if (string.IsNullOrWhiteSpace(definition.displayName) || definition.baseStats == null) throw new ArgumentException(definition.id + " 缺少名称或基础数值。");
-                definition.t1 ??= new SurvivorSkillUpgrade(); definition.t2 ??= new SurvivorSkillUpgrade(); definition.t3 ??= new SurvivorSkillUpgrade();
-                if ((definition.t2.enabled && !definition.t1.enabled) || (definition.t3.enabled && !definition.t2.enabled))
-                    throw new ArgumentException(definition.displayName + " 的强化必须从 T1 起连续启用。");
-                ordered[index] = definition;
-                resolved[index] = new SurvivorSkillStats[4];
-                descriptions[index] = new string[4];
-                descriptions[index][0] = definition.description ?? "";
-                var current = definition.baseStats.Copy();
-                SurvivorSkills.ValidateDebuffs(current.debuffs);
-                SurvivorSkills.ValidateStats(kind, current);
-                resolved[index][0] = current;
-                for (var tier = 1; tier <= 3; tier++)
-                {
-                    var upgrade = definition.Upgrade(tier);
-                    if (upgrade.enabled && string.IsNullOrWhiteSpace(upgrade.displayName)) throw new ArgumentException(definition.displayName + " T" + tier + " 缺少名称。");
-                    var next = current.Copy();
-                    var seen = new HashSet<SurvivorSkillParameter>();
-                    foreach (var change in upgrade.overrides ?? Array.Empty<SurvivorSkillValueOverride>())
-                    {
-                        if (change == null || !Enum.TryParse(change.parameter, false, out SurvivorSkillParameter parameter) || !Enum.IsDefined(typeof(SurvivorSkillParameter), parameter))
-                            throw new ArgumentException(definition.id + " T" + tier + " 包含未知的数值项目。");
-                        if (!seen.Add(parameter)) throw new ArgumentException(definition.id + " T" + tier + " 重复覆盖 " + parameter);
-                        if (Array.IndexOf(SurvivorSkills.Parameters(kind), parameter) < 0) throw new ArgumentException(definition.id + " 不使用参数 " + parameter);
-                        if (!SurvivorArena.IsFinite(change.value)) throw new ArgumentException("强化数值必须是有限数字。");
-                        var operation = string.IsNullOrEmpty(change.operation) ? "Set" : change.operation;
-                        var value = operation switch
-                        {
-                            "Set" => change.value, "Add" => next.Get(parameter) + change.value,
-                            "Multiply" => next.Get(parameter) * change.value,
-                            _ => throw new ArgumentException("覆盖方式必须为 Set、Add 或 Multiply。")
-                        };
-                        SurvivorSkills.ValidateValue(parameter, value);
-                        next.Set(parameter, value);
-                    }
-                    if (!string.IsNullOrWhiteSpace(upgrade.effectColor)) next.effectColor = upgrade.effectColor;
-                    SurvivorSkills.ValidateDebuffs(upgrade.debuffOverrides);
-                    var debuffs = new List<SurvivorDebuffConfig>(next.debuffs);
-                    foreach (var change in upgrade.debuffOverrides ?? Array.Empty<SurvivorDebuffConfig>())
-                    {
-                        debuffs.RemoveAll(item => item.type == change.type);
-                        if (change.enabled) debuffs.Add(change);
-                    }
-                    next.debuffs = debuffs.ToArray();
-                    SurvivorSkills.ValidateStats(kind, next);
-                    resolved[index][tier] = next;
-                    descriptions[index][tier] = descriptions[index][tier - 1] + (string.IsNullOrWhiteSpace(upgrade.additionalDescription) ? "" : "\n" + upgrade.additionalDescription);
-                    current = next;
-                }
-            }
-            _ordered = ordered;
-            _resolved = resolved;
-            _descriptions = descriptions;
-        }
-    }
-
     public static class SurvivorSkills
     {
-        public const string ResourcePath = "SurvivorDemo/Skills";
-        public const string AssetPath = "Assets/Scripts/Resources/SurvivorDemo/Skills.json";
+        public const int COMBAT_SKILL_COUNT = 8;
+        public const int SKILL_COUNT = 9;
+        public const int MODIFICATION_COUNT = 5;
+        public const int ALL_MODIFICATIONS = (1 << MODIFICATION_COUNT) - 1;
+        public const string AssetPath = SurvivorConfiguration.ASSET_DIRECTORY + "/Skills.json";
         public static readonly string[] DebuffTypes = { "Freeze", "Slow", "Bleed" };
         private static readonly SurvivorSkillParameter[][] ParameterSets =
         {
-            new[] { SurvivorSkillParameter.Cooldown, SurvivorSkillParameter.Radius, SurvivorSkillParameter.Damage, SurvivorSkillParameter.ProjectileCount, SurvivorSkillParameter.VolleyCount, SurvivorSkillParameter.VolleyInterval, SurvivorSkillParameter.ProjectileSpeed, SurvivorSkillParameter.ProjectileLifetime, SurvivorSkillParameter.ProjectileSpread },
-            new[] { SurvivorSkillParameter.Radius, SurvivorSkillParameter.Damage, SurvivorSkillParameter.OrbiterCount, SurvivorSkillParameter.OrbitSpeed, SurvivorSkillParameter.BladeRotationSpeed, SurvivorSkillParameter.OrbitHeight, SurvivorSkillParameter.HitInterval, SurvivorSkillParameter.Cooldown },
-            new[] { SurvivorSkillParameter.Cooldown, SurvivorSkillParameter.Radius, SurvivorSkillParameter.Damage, SurvivorSkillParameter.Knockback, SurvivorSkillParameter.KnockbackDecay, SurvivorSkillParameter.HeavyKnockbackMultiplier },
-            new[] { SurvivorSkillParameter.Cooldown, SurvivorSkillParameter.Radius, SurvivorSkillParameter.Damage, SurvivorSkillParameter.Duration, SurvivorSkillParameter.TickInterval }
+            new[] { SurvivorSkillParameter.Cooldown, SurvivorSkillParameter.Radius, SurvivorSkillParameter.DamageMultiplier, SurvivorSkillParameter.ProjectileCount, SurvivorSkillParameter.VolleyCount, SurvivorSkillParameter.VolleyInterval, SurvivorSkillParameter.ProjectileSpeed, SurvivorSkillParameter.ProjectileLifetime, SurvivorSkillParameter.ProjectileSpread },
+            new[] { SurvivorSkillParameter.Radius, SurvivorSkillParameter.DamageMultiplier, SurvivorSkillParameter.OrbiterCount, SurvivorSkillParameter.OrbitSpeed, SurvivorSkillParameter.BladeRotationSpeed, SurvivorSkillParameter.OrbitHeight, SurvivorSkillParameter.HitInterval, SurvivorSkillParameter.Cooldown },
+            new[] { SurvivorSkillParameter.Cooldown, SurvivorSkillParameter.Radius, SurvivorSkillParameter.DamageMultiplier, SurvivorSkillParameter.Knockback, SurvivorSkillParameter.KnockbackDecay, SurvivorSkillParameter.HeavyKnockbackMultiplier },
+            new[] { SurvivorSkillParameter.Cooldown, SurvivorSkillParameter.Radius, SurvivorSkillParameter.DamageMultiplier, SurvivorSkillParameter.Duration, SurvivorSkillParameter.TickInterval },
+            new[] { SurvivorSkillParameter.Cooldown, SurvivorSkillParameter.Radius, SurvivorSkillParameter.DamageMultiplier, SurvivorSkillParameter.ProjectileCount },
+            new[] { SurvivorSkillParameter.Cooldown, SurvivorSkillParameter.Radius, SurvivorSkillParameter.DamageMultiplier, SurvivorSkillParameter.Duration, SurvivorSkillParameter.TickInterval },
+            new[] { SurvivorSkillParameter.Cooldown, SurvivorSkillParameter.TargetRange, SurvivorSkillParameter.Radius, SurvivorSkillParameter.DamageMultiplier, SurvivorSkillParameter.ProjectileCount, SurvivorSkillParameter.ProjectileSpeed, SurvivorSkillParameter.ProjectileLifetime, SurvivorSkillParameter.ProjectileSpread },
+            new[] { SurvivorSkillParameter.Cooldown, SurvivorSkillParameter.TargetRange, SurvivorSkillParameter.Radius, SurvivorSkillParameter.DamageMultiplier, SurvivorSkillParameter.Duration, SurvivorSkillParameter.TickInterval },
+            new[] { SurvivorSkillParameter.Cooldown, SurvivorSkillParameter.Duration, SurvivorSkillParameter.DashSpeedMultiplier, SurvivorSkillParameter.InvulnerabilityDuration, SurvivorSkillParameter.Healing, SurvivorSkillParameter.Radius, SurvivorSkillParameter.DamageMultiplier }
         };
         public static SurvivorSkillParameter[] Parameters(SkillKind kind) => ParameterSets[(int)kind];
         public static bool IsCount(SurvivorSkillParameter parameter) => parameter is SurvivorSkillParameter.ProjectileCount or SurvivorSkillParameter.VolleyCount or SurvivorSkillParameter.OrbiterCount;
@@ -224,7 +129,7 @@ namespace Sanmon.SurvivorDemo
         public static string Label(SurvivorSkillParameter parameter) => parameter switch
         {
             SurvivorSkillParameter.Cooldown => "冷却（秒）", SurvivorSkillParameter.Radius => "半径 / 射程",
-            SurvivorSkillParameter.Damage => "每次命中伤害", SurvivorSkillParameter.ProjectileCount => "每轮子弹数量",
+            SurvivorSkillParameter.DamageMultiplier => "基础伤害倍率（倍）", SurvivorSkillParameter.ProjectileCount => "每轮子弹数量",
             SurvivorSkillParameter.VolleyCount => "连续发射轮数", SurvivorSkillParameter.VolleyInterval => "连发间隔（秒）",
             SurvivorSkillParameter.ProjectileSpeed => "子弹速度", SurvivorSkillParameter.ProjectileLifetime => "子弹存活时间（秒）",
             SurvivorSkillParameter.ProjectileSpread => "子弹间夹角（度）", SurvivorSkillParameter.OrbiterCount => "匕首数量",
@@ -232,14 +137,15 @@ namespace Sanmon.SurvivorDemo
             SurvivorSkillParameter.OrbitHeight => "匕首高度", SurvivorSkillParameter.HitInterval => "同一敌人的命中间隔（秒）",
             SurvivorSkillParameter.Duration => "区域持续时间（秒）", SurvivorSkillParameter.TickInterval => "区域伤害间隔（秒）",
             SurvivorSkillParameter.Knockback => "击退初速度", SurvivorSkillParameter.KnockbackDecay => "击退衰减速度",
-            SurvivorSkillParameter.HeavyKnockbackMultiplier => "重型敌人击退倍率", _ => parameter.ToString()
+            SurvivorSkillParameter.HeavyKnockbackMultiplier => "重型敌人击退倍率",
+            SurvivorSkillParameter.DashSpeedMultiplier => "冲刺速度倍率",
+            SurvivorSkillParameter.InvulnerabilityDuration => "冲刺无敌时间（秒）",
+            SurvivorSkillParameter.Healing => "冲刺回复生命", SurvivorSkillParameter.TargetRange => "自动索敌距离", _ => parameter.ToString()
         };
 
         public static SurvivorSkillCatalog Load()
         {
-            var asset = Resources.Load<TextAsset>(ResourcePath);
-            if (asset == null) throw new InvalidOperationException("缺少技能配置：" + AssetPath);
-            return Parse(asset.text);
+            return Parse(SurvivorConfiguration.ReadJson("Skills.json"));
         }
         public static SurvivorSkillCatalog Parse(string json)
         {
@@ -255,7 +161,7 @@ namespace Sanmon.SurvivorDemo
         }
         public static void ValidateValue(SurvivorSkillParameter parameter, float value)
         {
-            var minimum = parameter is SurvivorSkillParameter.Damage or SurvivorSkillParameter.ProjectileSpread or SurvivorSkillParameter.OrbitSpeed or SurvivorSkillParameter.BladeRotationSpeed or SurvivorSkillParameter.OrbitHeight or SurvivorSkillParameter.Knockback or SurvivorSkillParameter.HeavyKnockbackMultiplier ? 0 : 0.01f;
+            var minimum = parameter is SurvivorSkillParameter.DamageMultiplier or SurvivorSkillParameter.ProjectileSpread or SurvivorSkillParameter.OrbitSpeed or SurvivorSkillParameter.BladeRotationSpeed or SurvivorSkillParameter.OrbitHeight or SurvivorSkillParameter.Knockback or SurvivorSkillParameter.HeavyKnockbackMultiplier or SurvivorSkillParameter.InvulnerabilityDuration or SurvivorSkillParameter.Healing ? 0 : 0.01f;
             var maximum = parameter == SurvivorSkillParameter.HeavyKnockbackMultiplier ? 1 : IsCount(parameter) ? 64 : 100000;
             if (float.IsNaN(value) || float.IsInfinity(value) || value < minimum || value > maximum || (IsCount(parameter) && (value < 1 || value != Mathf.Round(value))))
                 throw new ArgumentException(Label(parameter) + " 的值无效：" + value);

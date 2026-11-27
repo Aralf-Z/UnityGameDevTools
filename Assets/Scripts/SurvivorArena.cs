@@ -11,16 +11,22 @@ namespace Sanmon.SurvivorDemo
     {
         public static SurvivorArena Instance { get; private set; }
         public const float ArenaRadius = 26;
-        public const int EnemyLimit = 180;
-        public const float RunDuration = 180;
+        public int EnemyLimit => _waves.enemyLimit;
+        public float RunDuration => _waves.runDuration;
         public SurvivorStats Stats { get; private set; } = new();
         public GameDevToolsController Tools { get; private set; }
         public bool IsPaused { get; private set; }
         public bool HasEnded { get; private set; }
         public bool HasWon { get; private set; }
-        public int PendingUpgrades { get; private set; }
-        public bool IsChoosingUpgrade => PendingUpgrades > 0 && !HasEnded;
+        public int PendingModifications { get; private set; }
+        public int PendingSkills { get; private set; }
+        public bool IsChoosingReward => _rewardChoices.Count > 0 && !HasEnded;
+        public bool IsChoosingSkill => IsChoosingReward && _rewardChoices[0].kind == SurvivorRewardKind.Skill;
         public SurvivorSkillCatalog SkillCatalog => _skills;
+        public SurvivorWaveCatalog WaveCatalog => _waves;
+        public SurvivorEnemyCatalog EnemyCatalog => _enemyCatalog;
+        public SurvivorLevelCatalog LevelCatalog => _levels;
+        public SurvivorEnemySkillCatalog EnemySkillCatalog => _enemySkills;
         public bool AutoSpawn { get; set; } = true;
         public bool AutoAttack { get; set; } = true;
         public int EnemyCount => _enemies.Count;
@@ -32,21 +38,27 @@ namespace Sanmon.SurvivorDemo
         public float SfxVolume { get => _audio != null ? _audio.volume : 0; set { if (_audio != null) _audio.volume = FiniteClamp(value, 0, 1); } }
 
         private readonly List<Enemy> _enemies = new();
-        private readonly Dictionary<EnemyKind, Stack<Enemy>> _enemyPool = new();
+        private readonly Dictionary<string, Stack<Enemy>> _enemyPool = new(StringComparer.Ordinal);
         private readonly List<Projectile> _projectiles = new();
         private readonly Stack<Projectile> _projectilePool = new();
         private readonly List<Gem> _gems = new();
         private readonly Stack<Gem> _gemPool = new();
         private readonly List<FrostZone> _frostZones = new();
-        private readonly int[] _skillLevels = { 1, 1, 1, 1 };
-        private readonly float[] _readyAt = new float[4];
+        private readonly int[] _skillLevels = new int[SurvivorSkills.SKILL_COUNT];
+        private readonly int[] _skillModifications = new int[SurvivorSkills.SKILL_COUNT];
+        private readonly float[] _readyAt = new float[SurvivorSkills.SKILL_COUNT];
         private readonly CancellationTokenSource _lifetime = new();
         private System.Random _random;
         private SurvivorSkillCatalog _skills;
+        private SurvivorWaveCatalog _waves;
+        private SurvivorEnemyCatalog _enemyCatalog;
+        private SurvivorLevelCatalog _levels;
+        private SurvivorEnemySkillCatalog _enemySkills;
         private bool _initialized;
         private float _originalTimeScale;
         private float _gameSpeed = 1;
         private float _nextSpawn;
+        private bool _hasAutoSpawned;
         private float _boltFollowUpAt = -1;
         private bool _boltFollowUpBurst;
         private Vector3 _boltFollowUpDirection;
@@ -65,12 +77,11 @@ namespace Sanmon.SurvivorDemo
         private Font _registeredFont;
         private Transform[] _orbiters = Array.Empty<Transform>();
 
-        public void Initialize(GameDevToolsController tools, Font font = null)
+        public void Initialize(GameDevToolsController tools, Font font = null, SurvivorConfiguration configuration = null)
         {
             if (_initialized) return;
             if (Instance != null && Instance != this) throw new InvalidOperationException("Only one SurvivorArena can run at a time.");
-            _skills = SurvivorSkills.Load();
-            _skillConfigurationJson = JsonUtility.ToJson(_skills);
+            SetConfiguration(configuration ?? SurvivorConfiguration.Load());
             _initialized = true;
             Instance = this;
             Tools = tools;
@@ -79,20 +90,24 @@ namespace Sanmon.SurvivorDemo
             _bestKills = PlayerPrefs.GetInt("GameDevTools.Survivor.BestKills", 0);
             BuildWorld();
             BuildHud(font);
-            RestartRun();
+            ResetRun(42);
             if (Tools != null)
             {
                 Tools.Macros?.RequestCommands();
-                SurvivorCommands.InstallExampleMacros();
-                Tools.Print("Survivor ready. DemoHelp() 查看所有示例；F1 打开工具，Esc 暂停。", LogType.Log);
+                SurvivorCommands.RemoveLegacyExampleMacros();
+                Tools.Print("Survivor 开发工具已就绪。SurvivorHelp() 查看调试命令；F1 打开工具，Esc 暂停。", LogType.Log);
             }
         }
 
         public void RestartRun(int seed = 42)
         {
             if (!_initialized) throw new InvalidOperationException("Arena has not been initialized.");
-            _skills = SurvivorSkills.Load();
-            _skillConfigurationJson = JsonUtility.ToJson(_skills);
+            if (!SurvivorConfiguration.UsesWebRequest) SetConfiguration(SurvivorConfiguration.Load());
+            ResetRun(seed);
+        }
+
+        private void ResetRun(int seed)
+        {
             _audio.Stop();
             _audio.UnPause();
             ClearEnemies(false);
@@ -101,35 +116,45 @@ namespace Sanmon.SurvivorDemo
             foreach (var gem in _gems) { gem.root.gameObject.SetActive(false); _gemPool.Push(gem); }
             _gems.Clear();
             ClearEffects();
-            Stats = new SurvivorStats();
+            _damageZones.Clear();
+            ClearEnemyProjectiles();
+            var initialHealth = _levels.MaxHealthAtLevel(1);
+            Stats = new SurvivorStats
+            {
+                Health = initialHealth,
+                MaxHealth = initialHealth,
+                HealthRegenerationPerSecond = _levels.HealthRegenerationAtLevel(1),
+                BaseDamage = _levels.BaseDamageAtLevel(1)
+            };
             _random = new System.Random(seed);
             _player.position = Vector3.zero;
             _facing = Vector3.forward;
             IsPaused = HasEnded = HasWon = false;
-            PendingUpgrades = 0;
             AutoSpawn = AutoAttack = true;
             _gameSpeed = 1;
-            _nextSpawn = 5;
+            _nextSpawn = _waves.firstSpawnDelay;
+            _hasAutoSpawned = false;
             _boltFollowUpAt = -1;
             _boltVolleysRemaining = 0;
             _invulnerableUntil = _dashUntil = _dashReadyAt = 0;
             _moveOverrideRemaining = 0;
-            for (var i = 0; i < 4; i++) { _skillLevels[i] = _skills.Get((SkillKind)i).enabled ? 1 : 0; _retainedSkillLevels[i] = 1; _readyAt[i] = 0; }
+            ResetProgression();
             ConfigureOrbiters();
             ApplyTimeScale();
-            Spawn(EnemyKind.Grunt, 12);
-            Toast("试验开始  /  SURVIVE 03:00");
+            SpawnGroups(_waves.initialSpawns);
+            SpawnGroups(_waves.waves[0].entrySpawns);
+            Toast("试验开始  /  SURVIVE " + TimeSpan.FromSeconds(RunDuration).ToString(@"mm\:ss"));
             RefreshHud(true);
         }
 
         private void Update()
         {
             if (!_initialized) return;
-            if (Input.GetKeyDown(KeyCode.Escape) && !IsChoosingUpgrade) SetPaused(!IsPaused);
+            if (Input.GetKeyDown(KeyCode.Escape) && !IsChoosingReward) SetPaused(!IsPaused);
             // F1 已由工具配置占用时交给总控处理，避免同一按键开关两次。
             if (Input.GetKeyDown(KeyCode.F1) && Config.KeyCode != KeyCode.F1) ToggleTools();
             var movement = Vector2.zero;
-            if (!IsPaused && !IsChoosingUpgrade && !HasEnded && (Tools == null || !Tools.IsOpen))
+            if (!IsPaused && !IsChoosingReward && !HasEnded && (Tools == null || !Tools.IsOpen))
             {
                 movement = CameraRelativeMovement(new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
                 if (Input.GetKeyDown(KeyCode.Space)) Dash();
@@ -141,49 +166,58 @@ namespace Sanmon.SurvivorDemo
 
         public void TickSimulation(float deltaTime, Vector2 movement)
         {
-            if (!_initialized || IsPaused || IsChoosingUpgrade || HasEnded || deltaTime <= 0) return;
+            if (!_initialized || IsPaused || IsChoosingReward || HasEnded || deltaTime <= 0) return;
             deltaTime = FiniteClamp(deltaTime, 0, 0.1f);
             if (!IsFinite(movement.x) || !IsFinite(movement.y)) throw new ArgumentException("Movement must be finite.");
             Stats.Elapsed += deltaTime;
+            if (Stats.Health > 0 && Stats.Health < Stats.MaxHealth && IsFinite(Stats.HealthRegenerationPerSecond) && Stats.HealthRegenerationPerSecond > 0)
+                Stats.Health = Mathf.Min(Stats.MaxHealth, Stats.Health + Stats.HealthRegenerationPerSecond * deltaTime);
             if (_moveOverrideRemaining > 0) { movement = _moveOverride; _moveOverrideRemaining -= deltaTime; }
             var direction = new Vector3(movement.x, 0, movement.y);
             direction = Vector3.ClampMagnitude(direction, 1);
             if (direction.sqrMagnitude > 0.001f) _facing = direction.normalized;
             var dashing = Stats.Elapsed < _dashUntil;
-            _player.position = Constrain(PlayerPosition + (dashing ? _dashDirection * 3.8f : direction) * (Stats.MoveSpeed * deltaTime), 0.5f);
+            var dashMultiplier = Parameters(SkillKind.Dash).dashSpeedMultiplier;
+            _player.position = Constrain(PlayerPosition + (dashing ? _dashDirection * dashMultiplier : direction) * (Stats.MoveSpeed * deltaTime), 0.5f);
             _playerBody.localRotation = Quaternion.Slerp(_playerBody.localRotation, Quaternion.LookRotation(_facing), 1 - Mathf.Exp(-16 * deltaTime));
             _playerBody.localPosition = new Vector3(0, 1.05f + Mathf.Sin(Stats.Elapsed * (direction.sqrMagnitude > 0 ? 14 : 3)) * 0.055f, 0);
             _playerBody.localScale = new Vector3(0.85f, dashing ? 0.8f : 1, 0.85f);
 
-            var wave = 1 + Mathf.FloorToInt(Stats.Elapsed / 20);
+            var waveIndex = _waves.IndexAt(Stats.Elapsed);
+            var wave = waveIndex + 1;
             if (wave != Stats.Wave)
             {
                 Stats.Wave = wave;
-                Spawn(EnemyKind.Tank, wave);
-                Toast("第 " + wave + " 波  /  敌人正在增强");
+                SpawnGroups(_waves.waves[waveIndex].entrySpawns);
+                Toast("第 " + wave + " 波  /  " + _waves.waves[waveIndex].displayName);
                 Debug.Log("[Survivor] Wave " + wave);
             }
 
             if (AutoSpawn && Stats.Elapsed >= _nextSpawn)
             {
-                _nextSpawn = Stats.Elapsed + Mathf.Max(0.65f, 2.4f - Stats.Wave * 0.14f);
-                Spawn((EnemyKind)_random.Next(Stats.Wave >= 3 ? 3 : 2), 2 + Stats.Wave);
+                var definition = _waves.waves[waveIndex];
+                _hasAutoSpawned = true;
+                _nextSpawn = Stats.Elapsed + definition.spawnInterval;
+                var id = definition.enemyPool[_random.Next(definition.enemyPool.Length)];
+                Spawn(id, definition.spawnCount);
             }
 
             TickBoltFollowUp();
             if (AutoAttack)
             {
-                TryAutoCast(SkillKind.Bolt, Parameters(SkillKind.Bolt).radius);
-                TryAutoCast(SkillKind.Frost, Parameters(SkillKind.Frost).radius);
-                TryAutoCast(SkillKind.Nova, Parameters(SkillKind.Nova).radius);
+                for (var i = 0; i < SurvivorSkills.COMBAT_SKILL_COUNT; i++)
+                    if ((SkillKind)i != SkillKind.Orbit) TryAutoCast((SkillKind)i, AutoCastRange((SkillKind)i));
             }
             TickFrostZones();
+            TickDamageZones();
             TickBleeding();
             TickEnemies(deltaTime);
             if (HasEnded) return;
+            TickEnemyProjectiles(deltaTime);
+            if (HasEnded) return;
             TickProjectiles(deltaTime);
             TickGems(deltaTime);
-            if (IsChoosingUpgrade) return;
+            if (IsChoosingReward) return;
             TickOrbiters();
             TickEffects(deltaTime);
             if (Stats.Elapsed >= RunDuration) EndRun(true);
@@ -241,52 +275,16 @@ namespace Sanmon.SurvivorDemo
 
         public bool Dash()
         {
-            if (IsPaused || IsChoosingUpgrade || HasEnded || Stats.Elapsed < _dashReadyAt) return false;
+            if (IsPaused || IsChoosingReward || HasEnded || Stats.Elapsed < _dashReadyAt) return false;
+            var stats = Parameters(SkillKind.Dash);
             _dashDirection = _facing;
-            _dashUntil = Stats.Elapsed + 0.24f;
-            _dashReadyAt = Stats.Elapsed + 3;
-            _invulnerableUntil = Mathf.Max(_invulnerableUntil, _dashUntil);
-            Burst(PlayerPosition, 1.8f, SurvivorPalette.Player);
+            _dashUntil = Stats.Elapsed + stats.duration;
+            _dashReadyAt = Stats.Elapsed + stats.cooldown;
+            _invulnerableUntil = Mathf.Max(_invulnerableUntil, Stats.Elapsed + stats.invulnerabilityDuration);
+            DamageArea(PlayerPosition, stats, SkillKind.Dash);
+            if (stats.healing > 0) SetHealth(Mathf.Min(Stats.MaxHealth, Stats.Health + stats.healing));
+            Burst(PlayerPosition, stats.radius, stats.color);
             PlayTone(0);
-            return true;
-        }
-
-        public int SkillLevel(SkillKind skill) => _skillLevels[(int)skill];
-        public int SkillTier(SkillKind skill) => Mathf.Max(0, SkillLevel(skill) - 1);
-        private SurvivorSkillStats Parameters(SkillKind skill) => _skills.Resolve(skill, SkillTier(skill));
-        private string SkillName(SkillKind skill) => _skills.Get(skill).displayName;
-        private int MaxSkillTier(SkillKind skill) => _skills.Get(skill).MaxTier;
-        private string UpgradeName(SkillKind skill, int tier) => tier > 0 ? _skills.Get(skill).Upgrade(tier).displayName : "基础";
-        private float SkillInterval(SkillKind skill) => Parameters(skill).cooldown;
-        public float SkillCooldown(SkillKind skill) => Mathf.Max(0, _readyAt[(int)skill] - Stats.Elapsed);
-        public bool CanUpgradeSkill(SkillKind skill) => SkillLevel(skill) > 0 && SkillTier(skill) < MaxSkillTier(skill);
-
-        private int RemainingSkillUpgrades()
-        {
-            var count = 0;
-            for (var i = 0; i < _skillLevels.Length; i++)
-                if (_skillLevels[i] > 0) count += Mathf.Max(0, MaxSkillTier((SkillKind)i) - SkillTier((SkillKind)i));
-            return count;
-        }
-
-        public void SetSkillLevel(SkillKind skill, int level)
-        {
-            _skillLevels[(int)skill] = Mathf.Clamp(level, 0, MaxSkillTier(skill) + 1);
-            if (_skillLevels[(int)skill] > 0) _retainedSkillLevels[(int)skill] = _skillLevels[(int)skill];
-            if (skill == SkillKind.Orbit) ConfigureOrbiters();
-            _readyAt[(int)skill] = Mathf.Min(_readyAt[(int)skill], Stats.Elapsed + SkillInterval(skill));
-            PendingUpgrades = Mathf.Min(PendingUpgrades, RemainingSkillUpgrades());
-            var tier = SkillTier(skill);
-            Toast(SkillName(skill) + (level <= 0 ? " 已关闭" : tier == 0 ? " 基础" : " T" + tier + " / " + UpgradeName(skill, tier)));
-            ApplyTimeScale();
-            RefreshHud(true);
-        }
-
-        public bool ChooseSkillUpgrade(SkillKind skill)
-        {
-            if (!IsChoosingUpgrade || !CanUpgradeSkill(skill)) return false;
-            PendingUpgrades--;
-            SetSkillLevel(skill, SkillLevel(skill) + 1);
             return true;
         }
 
@@ -308,12 +306,17 @@ namespace Sanmon.SurvivorDemo
 
         public bool TryCast(SkillKind skill, bool force = false)
         {
+            if (skill == SkillKind.Dash) return Dash();
             var level = SkillLevel(skill);
-            if (level == 0 || (!force && (IsPaused || IsChoosingUpgrade || HasEnded || SkillCooldown(skill) > 0))) return false;
+            if (level == 0 || (!force && (IsPaused || IsChoosingReward || HasEnded || SkillCooldown(skill) > 0))) return false;
             if (skill == SkillKind.Bolt) FireBolts(true);
             else if (skill == SkillKind.Orbit) Burst(PlayerPosition, Parameters(skill).radius, Parameters(skill).color);
             else if (skill == SkillKind.Nova) CastShockwave();
             else if (skill == SkillKind.Frost && !CastFrostZone()) return false;
+            else if (skill == SkillKind.Lightning && !CastLightning()) return false;
+            else if (skill == SkillKind.Flame && !CastDamageZone(skill, true)) return false;
+            else if (skill == SkillKind.Missile && !FireMissiles()) return false;
+            else if (skill == SkillKind.Venom && !CastDamageZone(skill, false)) return false;
             _readyAt[(int)skill] = Stats.Elapsed + SkillInterval(skill);
             return true;
         }
@@ -329,10 +332,10 @@ namespace Sanmon.SurvivorDemo
                 var away = enemy.root.position - origin;
                 if (away.sqrMagnitude > radius * radius) continue;
                 var direction = away.sqrMagnitude > 0.001f ? away.normalized : _facing;
-                enemy.knockbackVelocity = direction * stats.knockback * (enemy.kind == EnemyKind.Tank ? stats.heavyKnockbackMultiplier : 1);
+                enemy.knockbackVelocity = direction * stats.knockback * (_enemyCatalog.Get(enemy.id).heavy ? stats.heavyKnockbackMultiplier : 1);
                 enemy.knockbackDecay = stats.knockbackDecay;
                 ApplyDebuffs(enemy, stats.debuffs, SkillKind.Nova);
-                DamageEnemy(i, stats.damage * Stats.DamageMultiplier);
+                DamageEnemy(i, stats.damageMultiplier * Stats.BaseDamage);
             }
             Burst(origin, radius, stats.color, 0.5f);
             Burst(origin, radius * 0.75f, SurvivorPalette.Alpha(stats.color, 0.6f), 0.65f);
@@ -351,8 +354,8 @@ namespace Sanmon.SurvivorDemo
             var zone = new FrostZone
             {
                 position = origin, radius = radius, createdAt = Stats.Elapsed, expiresAt = Stats.Elapsed + duration,
-                nextDamageAt = Stats.Elapsed, damage = stats.damage * Stats.DamageMultiplier,
-                damageMultiplier = Stats.DamageMultiplier, tickInterval = stats.tickInterval, debuffs = stats.debuffs
+                nextDamageAt = Stats.Elapsed, damageMultiplier = stats.damageMultiplier,
+                tickInterval = stats.tickInterval, debuffs = stats.debuffs
             };
             Burst(origin, radius, stats.color, 0.55f);
             zone.outer = Burst(origin, radius, SurvivorPalette.Alpha(stats.color, 0.8f), duration, true);
@@ -378,29 +381,37 @@ namespace Sanmon.SurvivorDemo
                     var enemy = _enemies[j];
                     if ((enemy.root.position - zone.position).sqrMagnitude > zone.radius * zone.radius) continue;
                     ApplyDebuffs(enemy, zone.debuffs, SkillKind.Frost, zone.expiresAt);
-                    if (dealDamage) DamageEnemy(j, zone.damage);
+                    if (dealDamage) DamageEnemy(j, zone.damageMultiplier * Stats.BaseDamage);
                 }
             }
         }
 
-        public int Spawn(EnemyKind kind, int count, ArenaPoint? location = null)
+        public int Spawn(EnemyKind kind, int count, ArenaPoint? location = null) => Spawn(kind.ToString(), count, location);
+
+        public int Spawn(string id, int count, ArenaPoint? location = null)
         {
-            count = Mathf.Clamp(count, 0, EnemyLimit - _enemies.Count);
+            var definition = _enemyCatalog.Get(id);
+            count = Mathf.Clamp(count, 0, Mathf.Max(0, EnemyLimit - _enemies.Count));
             for (var i = 0; i < count; i++)
             {
-                if (!_enemyPool.TryGetValue(kind, out var pool)) _enemyPool[kind] = pool = new Stack<Enemy>();
-                var enemy = pool.Count > 0 ? pool.Pop() : CreateEnemy(kind);
+                if (!_enemyPool.TryGetValue(id, out var pool)) _enemyPool[id] = pool = new Stack<Enemy>();
+                var enemy = pool.Count > 0 ? pool.Pop() : CreateEnemy(id);
+                enemy.sizeSample = (float)_random.NextDouble();
+                ApplyEnemyAppearance(enemy, definition);
                 var angle = (float)_random.NextDouble() * Mathf.PI * 2;
-                var distance = location.HasValue ? 0.8f + i * 0.35f : 12 + (float)_random.NextDouble() * 7;
+                var distance = location.HasValue ? 0.8f + i * 0.35f : Mathf.Lerp(_waves.spawnDistanceMin, _waves.spawnDistanceMax, (float)_random.NextDouble());
                 var position = (location?.Position ?? PlayerPosition) + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * distance;
                 enemy.root.position = Constrain(position, enemy.radius);
-                enemy.health = enemy.maxHealth = (kind == EnemyKind.Tank ? 110 : kind == EnemyKind.Runner ? 22 : 38) * (1 + (Stats.Wave - 1) * 0.18f);
+                enemy.spawnWave = Stats.Wave;
+                enemy.health = enemy.maxHealth = definition.HealthAtWave(enemy.spawnWave);
+                enemy.body.sharedMaterial = MaterialFor(definition.color);
                 enemy.contactAt = enemy.orbitAt = enemy.frozenUntil = enemy.flashUntil = 0;
                 enemy.bleedUntil = enemy.nextBleedAt = 0;
                 enemy.slowUntil = 0;
                 enemy.slowMultiplier = 1;
                 enemy.knockbackDecay = Parameters(SkillKind.Nova).knockbackDecay;
                 enemy.knockbackVelocity = Vector3.zero;
+                SynchronizeEnemySkills(enemy, definition, null, true);
                 enemy.body.SetPropertyBlock(null);
                 enemy.root.gameObject.SetActive(true);
                 _enemies.Add(enemy);
@@ -414,31 +425,9 @@ namespace Sanmon.SurvivorDemo
             for (var i = _enemies.Count - 1; i >= 0; i--)
             {
                 if (grantExperience) KillEnemy(i);
-                else { var enemy = _enemies[i]; enemy.root.gameObject.SetActive(false); _enemyPool[enemy.kind].Push(enemy); _enemies.RemoveAt(i); }
+                else { var enemy = _enemies[i]; CancelEnemyCast(enemy); enemy.root.gameObject.SetActive(false); _enemyPool[enemy.id].Push(enemy); _enemies.RemoveAt(i); }
             }
             return count;
-        }
-
-        public void AddExperience(int amount)
-        {
-            Stats.Experience += Mathf.Clamp(amount, 0, 100000);
-            var levels = 0;
-            while (Stats.Experience >= Stats.ExperienceRequired && Stats.Level < 100)
-            {
-                Stats.Experience -= Stats.ExperienceRequired;
-                Stats.Level++;
-                Stats.MaxHealth += 8;
-                Stats.Health = Mathf.Min(Stats.MaxHealth, Stats.Health + 20);
-                Stats.DamageMultiplier += 0.08f;
-                levels++;
-                Burst(PlayerPosition, 4, SurvivorPalette.Gold);
-            }
-            if (levels == 0) return;
-            PendingUpgrades = Mathf.Min(PendingUpgrades + levels, RemainingSkillUpgrades());
-            Toast("LEVEL " + Stats.Level + (PendingUpgrades > 0 ? "  /  选择技能升级" : "  /  技能已全部满级"));
-            PlayTone(2);
-            ApplyTimeScale();
-            RefreshHud(true);
         }
 
         private void TickEnemies(float dt)
@@ -449,15 +438,20 @@ namespace Sanmon.SurvivorDemo
                 var delta = PlayerPosition - enemy.root.position;
                 var frozen = Stats.Elapsed < enemy.frozenUntil;
                 var knockedBack = enemy.knockbackVelocity.sqrMagnitude > 0.1f;
-                var speed = enemy.kind == EnemyKind.Runner ? 4.5f : enemy.kind == EnemyKind.Tank ? 1.65f : 2.7f;
+                var definition = _enemyCatalog.Get(enemy.id);
+                var speed = definition.moveSpeed;
                 if (Stats.Elapsed < enemy.slowUntil) speed *= enemy.slowMultiplier;
-                var velocity = delta.sqrMagnitude > 0.001f ? delta.normalized : Vector3.zero;
+                if (Stats.Elapsed < enemy.hasteUntil) speed *= enemy.hasteMultiplier;
+                var velocity = EnemyMovementDirection(definition, delta);
                 for (var j = Mathf.Max(0, i - 8); j < i; j++)
                 {
                     var away = enemy.root.position - _enemies[j].root.position;
                     if (away.sqrMagnitude > 0.001f && away.sqrMagnitude < 1.8f) velocity += away.normalized * 0.7f;
                 }
                 var movement = frozen || knockedBack ? Vector3.zero : Vector3.ClampMagnitude(velocity, 1) * speed;
+                if (enemy.cast != null) movement = Vector3.zero;
+                if (!frozen && !knockedBack && Stats.Elapsed < enemy.chargeUntil) movement = enemy.chargeDirection * enemy.chargeSpeed;
+                enemy.previousPosition = enemy.root.position;
                 enemy.root.position = Constrain(enemy.root.position + (movement + enemy.knockbackVelocity) * dt, enemy.radius);
                 enemy.knockbackVelocity *= Mathf.Exp(-enemy.knockbackDecay * dt);
                 if (!frozen && !knockedBack && delta.sqrMagnitude > 0.01f) enemy.body.transform.rotation = Quaternion.LookRotation(delta);
@@ -467,11 +461,13 @@ namespace Sanmon.SurvivorDemo
                     if (frozen) { _flash.SetColor("_Color", SurvivorPalette.Frost); enemy.body.SetPropertyBlock(_flash); }
                     else enemy.body.SetPropertyBlock(null);
                 }
-                if (frozen || knockedBack) continue;
+                if (frozen || knockedBack) { CancelEnemyCast(enemy); enemy.chargeUntil = 0; continue; }
+                TickEnemyAbilities(enemy, definition);
+                if (HasEnded) return;
                 if (delta.sqrMagnitude < (enemy.radius + 0.65f) * (enemy.radius + 0.65f) && Stats.Elapsed >= enemy.contactAt)
                 {
-                    enemy.contactAt = Stats.Elapsed + 1;
-                    HurtPlayer(enemy.kind == EnemyKind.Tank ? 20 : 8);
+                    enemy.contactAt = Stats.Elapsed + definition.contactInterval;
+                    HurtPlayer(definition.contactDamage);
                     if (HasEnded) return;
                 }
             }
@@ -489,7 +485,7 @@ namespace Sanmon.SurvivorDemo
 
         private void FireBolts(bool burst, bool followUp = false)
         {
-            if (_skillLevels[0] == 0 || _projectiles.Count >= 220) return;
+            if (SkillLevel(SkillKind.Bolt) == 0 || _projectiles.Count >= 220) return;
             var stats = Parameters(SkillKind.Bolt);
             Enemy nearest = null;
             var best = stats.radius * stats.radius;
@@ -506,8 +502,10 @@ namespace Sanmon.SurvivorDemo
                 var projectile = _projectilePool.Count > 0 ? _projectilePool.Pop() : CreateProjectile();
                 projectile.direction = Quaternion.Euler(0, (i - (count - 1) / 2f) * stats.projectileSpread, 0) * direction;
                 projectile.position = PlayerPosition;
-                projectile.damage = stats.damage * Stats.DamageMultiplier;
-                projectile.damageMultiplier = Stats.DamageMultiplier;
+                projectile.damageMultiplier = stats.damageMultiplier;
+                projectile.source = SkillKind.Bolt;
+                projectile.target = null;
+                projectile.explosionRadius = 0;
                 projectile.createdAt = Stats.Elapsed;
                 projectile.life = stats.projectileLifetime;
                 projectile.speed = stats.projectileSpeed;
@@ -533,6 +531,11 @@ namespace Sanmon.SurvivorDemo
             for (var i = _projectiles.Count - 1; i >= 0; i--)
             {
                 var projectile = _projectiles[i];
+                if (projectile.source == SkillKind.Missile && projectile.target != null && _enemies.Contains(projectile.target))
+                {
+                    var targetDirection = projectile.target.root.position - projectile.position;
+                    if (targetDirection.sqrMagnitude > 0.001f) projectile.direction = targetDirection.normalized;
+                }
                 var before = projectile.position;
                 projectile.position += projectile.direction * projectile.speed * dt;
                 projectile.life -= dt;
@@ -542,12 +545,21 @@ namespace Sanmon.SurvivorDemo
                     var segment = projectile.position - before;
                     var along = Mathf.Clamp01(Vector3.Dot(_enemies[j].root.position - before, segment) / Mathf.Max(0.0001f, segment.sqrMagnitude));
                     if ((_enemies[j].root.position - (before + along * segment)).sqrMagnitude > Mathf.Pow(_enemies[j].radius + 0.3f, 2)) continue;
-                    ApplyDebuffs(_enemies[j], projectile.debuffs, SkillKind.Bolt);
-                    DamageEnemy(j, projectile.damage);
+                    if (projectile.source == SkillKind.Missile)
+                    {
+                        projectile.position = before + along * segment;
+                        ExplodeMissile(projectile);
+                    }
+                    else
+                    {
+                        ApplyDebuffs(_enemies[j], projectile.debuffs, projectile.source);
+                        DamageEnemy(j, projectile.damageMultiplier * Stats.BaseDamage);
+                    }
                     hit = true;
                     break;
                 }
                 projectile.root.position = projectile.position + Vector3.up * 0.9f;
+                if (projectile.source == SkillKind.Missile && !hit && projectile.life <= 0) ExplodeMissile(projectile);
                 if (!hit && projectile.life > 0) continue;
                 projectile.root.gameObject.SetActive(false);
                 _projectilePool.Push(projectile);
@@ -561,13 +573,13 @@ namespace Sanmon.SurvivorDemo
             var count = stats.orbiterCount;
             for (var i = 0; i < _orbiters.Length; i++)
             {
-                _orbiters[i].gameObject.SetActive(AutoAttack && _skillLevels[1] > 0 && i < count);
+                _orbiters[i].gameObject.SetActive(AutoAttack && SkillLevel(SkillKind.Orbit) > 0 && i < count);
                 if (i >= count) continue;
                 var angle = Stats.Elapsed * stats.orbitSpeed + i * Mathf.PI * 2 / count;
                 _orbiters[i].position = PlayerPosition + new Vector3(Mathf.Cos(angle) * stats.radius, stats.orbitHeight, Mathf.Sin(angle) * stats.radius);
                 _orbiters[i].Rotate(0, stats.bladeRotationSpeed * Time.deltaTime, 0);
             }
-            if (!AutoAttack || _skillLevels[1] == 0) return;
+            if (!AutoAttack || SkillLevel(SkillKind.Orbit) == 0) return;
             for (var i = _enemies.Count - 1; i >= 0; i--)
             {
                 var enemy = _enemies[i];
@@ -579,7 +591,7 @@ namespace Sanmon.SurvivorDemo
                     if (difference.sqrMagnitude > Mathf.Pow(enemy.radius + 0.6f, 2)) continue;
                     enemy.orbitAt = Stats.Elapsed + stats.hitInterval;
                     ApplyDebuffs(enemy, stats.debuffs, SkillKind.Orbit);
-                    DamageEnemy(i, stats.damage * Stats.DamageMultiplier);
+                    DamageEnemy(i, stats.damageMultiplier * Stats.BaseDamage);
                     break;
                 }
             }
@@ -627,6 +639,7 @@ namespace Sanmon.SurvivorDemo
         private void DamageEnemy(int index, float damage)
         {
             var enemy = _enemies[index];
+            if (Stats.Elapsed < enemy.guardUntil) damage *= 1 - enemy.damageReduction;
             enemy.health -= damage;
             enemy.flashUntil = Stats.Elapsed + 0.08f;
             _flash.SetColor("_Color", SurvivorPalette.Text);
@@ -637,7 +650,8 @@ namespace Sanmon.SurvivorDemo
         private void KillEnemy(int index)
         {
             var enemy = _enemies[index];
-            var experience = enemy.kind == EnemyKind.Tank ? 5 : 1;
+            CancelEnemyCast(enemy);
+            var experience = _enemyCatalog.Get(enemy.id).experience;
             if (_gems.Count >= 512) _gems[_gems.Count - 1].value += experience;
             else
             {
@@ -648,7 +662,7 @@ namespace Sanmon.SurvivorDemo
                 _gems.Add(gem);
             }
             enemy.root.gameObject.SetActive(false);
-            _enemyPool[enemy.kind].Push(enemy);
+            _enemyPool[enemy.id].Push(enemy);
             _enemies.RemoveAt(index);
             Stats.Kills++;
         }
@@ -668,7 +682,7 @@ namespace Sanmon.SurvivorDemo
                 _gemPool.Push(gem);
                 _gems.RemoveAt(i);
                 PlayTone(4);
-                if (IsChoosingUpgrade) return;
+                if (IsChoosingReward) return;
             }
         }
 
@@ -676,7 +690,10 @@ namespace Sanmon.SurvivorDemo
         {
             if (HasEnded) return;
             HasEnded = true;
-            PendingUpgrades = 0;
+            PendingModifications = 0;
+            PendingSkills = 0;
+            _pendingRewards.Clear();
+            _rewardChoices.Clear();
             HasWon = won;
             IsPaused = false;
             _audio.UnPause();
@@ -707,9 +724,9 @@ namespace Sanmon.SurvivorDemo
         private void ApplyTimeScale()
         {
             if (!_initialized) return;
-            Time.timeScale = IsPaused || IsChoosingUpgrade || HasEnded ? 0 : _gameSpeed;
+            Time.timeScale = IsPaused || IsChoosingReward || HasEnded ? 0 : _gameSpeed;
             if (_audio == null) return;
-            if (IsPaused || IsChoosingUpgrade) _audio.Pause(); else _audio.UnPause();
+            if (IsPaused || IsChoosingReward) _audio.Pause(); else _audio.UnPause();
         }
         public static bool IsFinite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
         public static float FiniteClamp(float value, float min, float max) => IsFinite(value) ? Mathf.Clamp(value, min, max) : throw new ArgumentOutOfRangeException(nameof(value), "Value must be finite.");
@@ -724,9 +741,23 @@ namespace Sanmon.SurvivorDemo
             if (Instance == this) { Instance = null; Time.timeScale = _originalTimeScale; }
         }
 
-        private struct FrostZone { public Vector3 position; public float radius, createdAt, expiresAt, nextDamageAt, damage, damageMultiplier, tickInterval; public SurvivorDebuffConfig[] debuffs; public RingEffect outer, middle, inner; }
-        private sealed class Enemy { public Transform root, healthBar; public Renderer body; public Transform bar; public EnemyKind kind; public SkillKind freezeSource, slowSource, bleedSource; public Vector3 knockbackVelocity; public float radius, health, maxHealth, contactAt, orbitAt, frozenUntil, flashUntil, bleedUntil, nextBleedAt, bleedInterval, bleedPercent, slowUntil, slowMultiplier, knockbackDecay; }
-        private sealed class Projectile { public Transform root; public Renderer body; public Vector3 position, direction; public float damage, damageMultiplier, createdAt, life, speed; public SurvivorDebuffConfig[] debuffs; }
+        private struct FrostZone { public Vector3 position; public float radius, createdAt, expiresAt, nextDamageAt, damageMultiplier, tickInterval; public SurvivorDebuffConfig[] debuffs; public RingEffect outer, middle, inner; }
+        private sealed class Enemy
+        {
+            public Transform root, healthBar, bar;
+            public Renderer body;
+            public string id;
+            public PrimitiveType shape;
+            public int spawnWave;
+            public SkillKind freezeSource, slowSource, bleedSource;
+            public Vector3 knockbackVelocity, chargeDirection, previousPosition;
+            public float sizeSample, radius, health, maxHealth, contactAt, orbitAt, frozenUntil, flashUntil, bleedUntil, nextBleedAt, bleedInterval, bleedPercent, slowUntil, slowMultiplier, knockbackDecay;
+            public float chargeUntil, chargeSpeed, chargeDamage, guardUntil, damageReduction, hasteUntil, hasteMultiplier;
+            public bool chargeHit;
+            public EnemyCast cast;
+            public List<EnemySkillState> skills = new();
+        }
+        private sealed class Projectile { public Transform root; public Renderer body; public Vector3 position, direction; public SkillKind source; public Enemy target; public float explosionRadius, damageMultiplier, createdAt, life, speed; public SurvivorDebuffConfig[] debuffs; }
         private sealed class Gem { public Transform root; public int value; }
     }
 }

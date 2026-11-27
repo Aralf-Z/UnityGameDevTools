@@ -1,0 +1,7 @@
+{
+  "name": "Sanmon.SurvivorDemo.Tests",
+  "rootNamespace": "Sanmon.SurvivorDemo.Tests",
+  "references": ["Sanmon.SurvivorDemo", "Sanmon.SurvivorDemo.Editor", "GameDevTools.Runtime"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}

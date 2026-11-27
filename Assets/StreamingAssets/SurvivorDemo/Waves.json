@@ -1,0 +1,250 @@
+{
+  "version": 1,
+  "runDuration": 180,
+  "enemyLimit": 180,
+  "firstSpawnDelay": 5,
+  "spawnDistanceMin": 12,
+  "spawnDistanceMax": 19,
+  "initialSpawns": [
+    {
+      "count": 12,
+      "enemy": "Grunt"
+    }
+  ],
+  "waves": [
+    {
+      "displayName": "敌人正在增强 1",
+      "startTime": 0,
+      "spawnInterval": 2.26,
+      "spawnCount": 3,
+      "enemyPool": [
+        "Grunt",
+        "Runner",
+        "Archer"
+      ],
+      "entrySpawns": []
+    },
+    {
+      "displayName": "敌人正在增强 2",
+      "startTime": 20,
+      "spawnInterval": 2.12,
+      "spawnCount": 4,
+      "enemyPool": [
+        "Grunt",
+        "Runner",
+        "Archer",
+        "Tank"
+      ],
+      "entrySpawns": [
+        {
+          "enemy": "Tank",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "displayName": "敌人正在增强 3",
+      "startTime": 40,
+      "spawnInterval": 1.98,
+      "spawnCount": 5,
+      "enemyPool": [
+        "Grunt",
+        "Runner",
+        "Archer",
+        "Tank",
+        "Berserker",
+        "Assassin",
+        "FireMage"
+      ],
+      "entrySpawns": [
+        {
+          "enemy": "Berserker",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "displayName": "敌人正在增强 4",
+      "startTime": 60,
+      "spawnInterval": 1.84,
+      "spawnCount": 6,
+      "enemyPool": [
+        "Grunt",
+        "Runner",
+        "Archer",
+        "Tank",
+        "Berserker",
+        "Assassin",
+        "FireMage",
+        "IronGuard",
+        "Artillery"
+      ],
+      "entrySpawns": [
+        {
+          "enemy": "IronGuard",
+          "count": 1
+        },
+        {
+          "enemy": "FireMage",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "displayName": "敌人正在增强 5",
+      "startTime": 80,
+      "spawnInterval": 1.7,
+      "spawnCount": 7,
+      "enemyPool": [
+        "Grunt",
+        "Runner",
+        "Archer",
+        "Tank",
+        "Berserker",
+        "Assassin",
+        "FireMage",
+        "IronGuard",
+        "Artillery",
+        "Colossus",
+        "Warlord",
+        "ShadowDancer"
+      ],
+      "entrySpawns": [
+        {
+          "enemy": "Colossus",
+          "count": 1.0
+        }
+      ]
+    },
+    {
+      "displayName": "敌人正在增强 6",
+      "startTime": 100,
+      "spawnInterval": 1.56,
+      "spawnCount": 8,
+      "enemyPool": [
+        "Grunt",
+        "Runner",
+        "Archer",
+        "Tank",
+        "Berserker",
+        "Assassin",
+        "FireMage",
+        "IronGuard",
+        "Artillery",
+        "Colossus",
+        "Warlord",
+        "ShadowDancer"
+      ],
+      "entrySpawns": [
+        {
+          "enemy": "Warlord",
+          "count": 1.0
+        }
+      ]
+    },
+    {
+      "displayName": "敌人正在增强 7",
+      "startTime": 120,
+      "spawnInterval": 1.42,
+      "spawnCount": 9,
+      "enemyPool": [
+        "Grunt",
+        "Runner",
+        "Archer",
+        "Tank",
+        "Berserker",
+        "Assassin",
+        "FireMage",
+        "IronGuard",
+        "Artillery",
+        "Colossus",
+        "Warlord",
+        "ShadowDancer"
+      ],
+      "entrySpawns": [
+        {
+          "enemy": "ShadowDancer",
+          "count": 1.0
+        }
+      ]
+    },
+    {
+      "displayName": "敌人正在增强 8",
+      "startTime": 140,
+      "spawnInterval": 1.28,
+      "spawnCount": 10,
+      "enemyPool": [
+        "Grunt",
+        "Runner",
+        "Archer",
+        "Tank",
+        "Berserker",
+        "Assassin",
+        "FireMage",
+        "IronGuard",
+        "Artillery",
+        "Colossus",
+        "Warlord",
+        "ShadowDancer"
+      ],
+      "entrySpawns": [
+        {
+          "enemy": "Artillery",
+          "count": 2.0
+        }
+      ]
+    },
+    {
+      "displayName": "敌人正在增强 9",
+      "startTime": 160,
+      "spawnInterval": 1.14,
+      "spawnCount": 11,
+      "enemyPool": [
+        "Grunt",
+        "Runner",
+        "Archer",
+        "Tank",
+        "Berserker",
+        "Assassin",
+        "FireMage",
+        "IronGuard",
+        "Artillery",
+        "Colossus",
+        "Warlord",
+        "ShadowDancer"
+      ],
+      "entrySpawns": [
+        {
+          "enemy": "Colossus",
+          "count": 2.0
+        }
+      ]
+    },
+    {
+      "displayName": "敌人正在增强 10",
+      "startTime": 180,
+      "spawnInterval": 1.0,
+      "spawnCount": 12,
+      "enemyPool": [
+        "Grunt",
+        "Runner",
+        "Archer",
+        "Tank",
+        "Berserker",
+        "Assassin",
+        "FireMage",
+        "IronGuard",
+        "Artillery",
+        "Colossus",
+        "Warlord",
+        "ShadowDancer"
+      ],
+      "entrySpawns": [
+        {
+          "enemy": "Warlord",
+          "count": 2.0
+        }
+      ]
+    }
+  ]
+}

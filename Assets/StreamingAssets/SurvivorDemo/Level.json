@@ -1,0 +1,908 @@
+{
+    "version": 3,
+    "baseMaxHealth": 100.0,
+    "healthRegenerationPerSecond": 0.5,
+    "baseDamage": 10.0,
+    "levels": [
+        {
+            "level": 1,
+            "totalExperience": 0,
+            "skillRewards": 1,
+            "modificationRewards": 0,
+            "maxHealthGain": 0.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.0
+        },
+        {
+            "level": 2,
+            "totalExperience": 8,
+            "skillRewards": 1,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 3,
+            "totalExperience": 21,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 4,
+            "totalExperience": 39,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 5,
+            "totalExperience": 62,
+            "skillRewards": 1,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 6,
+            "totalExperience": 90,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 7,
+            "totalExperience": 123,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 8,
+            "totalExperience": 161,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 9,
+            "totalExperience": 204,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 10,
+            "totalExperience": 252,
+            "skillRewards": 1,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 11,
+            "totalExperience": 305,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 12,
+            "totalExperience": 363,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 13,
+            "totalExperience": 426,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 14,
+            "totalExperience": 494,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 15,
+            "totalExperience": 567,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 16,
+            "totalExperience": 645,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 17,
+            "totalExperience": 728,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 18,
+            "totalExperience": 816,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 19,
+            "totalExperience": 909,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 20,
+            "totalExperience": 1007,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 21,
+            "totalExperience": 1110,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 22,
+            "totalExperience": 1218,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 23,
+            "totalExperience": 1331,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 24,
+            "totalExperience": 1449,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 25,
+            "totalExperience": 1572,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 26,
+            "totalExperience": 1700,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 27,
+            "totalExperience": 1833,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 28,
+            "totalExperience": 1971,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 29,
+            "totalExperience": 2114,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 30,
+            "totalExperience": 2262,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 31,
+            "totalExperience": 2415,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 32,
+            "totalExperience": 2573,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 33,
+            "totalExperience": 2736,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 34,
+            "totalExperience": 2904,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 35,
+            "totalExperience": 3077,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 36,
+            "totalExperience": 3255,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 37,
+            "totalExperience": 3438,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 38,
+            "totalExperience": 3626,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 39,
+            "totalExperience": 3819,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 40,
+            "totalExperience": 4017,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 41,
+            "totalExperience": 4220,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 42,
+            "totalExperience": 4428,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 43,
+            "totalExperience": 4641,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 44,
+            "totalExperience": 4859,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 45,
+            "totalExperience": 5082,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 46,
+            "totalExperience": 5310,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 47,
+            "totalExperience": 5543,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 48,
+            "totalExperience": 5781,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 49,
+            "totalExperience": 6024,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 50,
+            "totalExperience": 6272,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 51,
+            "totalExperience": 6525,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 52,
+            "totalExperience": 6783,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 53,
+            "totalExperience": 7046,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 54,
+            "totalExperience": 7314,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 55,
+            "totalExperience": 7587,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 56,
+            "totalExperience": 7865,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 57,
+            "totalExperience": 8148,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 58,
+            "totalExperience": 8436,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 59,
+            "totalExperience": 8729,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 60,
+            "totalExperience": 9027,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 61,
+            "totalExperience": 9330,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 62,
+            "totalExperience": 9638,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 63,
+            "totalExperience": 9951,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 64,
+            "totalExperience": 10269,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 65,
+            "totalExperience": 10592,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 66,
+            "totalExperience": 10920,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 67,
+            "totalExperience": 11253,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 68,
+            "totalExperience": 11591,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 69,
+            "totalExperience": 11934,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 70,
+            "totalExperience": 12282,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 71,
+            "totalExperience": 12635,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 72,
+            "totalExperience": 12993,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 73,
+            "totalExperience": 13356,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 74,
+            "totalExperience": 13724,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 75,
+            "totalExperience": 14097,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 76,
+            "totalExperience": 14475,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 77,
+            "totalExperience": 14858,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 78,
+            "totalExperience": 15246,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 79,
+            "totalExperience": 15639,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 80,
+            "totalExperience": 16037,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 81,
+            "totalExperience": 16440,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 82,
+            "totalExperience": 16848,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 83,
+            "totalExperience": 17261,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 84,
+            "totalExperience": 17679,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 85,
+            "totalExperience": 18102,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 86,
+            "totalExperience": 18530,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 87,
+            "totalExperience": 18963,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 88,
+            "totalExperience": 19401,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 89,
+            "totalExperience": 19844,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 90,
+            "totalExperience": 20292,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 91,
+            "totalExperience": 20745,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 92,
+            "totalExperience": 21203,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 93,
+            "totalExperience": 21666,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 94,
+            "totalExperience": 22134,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 95,
+            "totalExperience": 22607,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 96,
+            "totalExperience": 23085,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 97,
+            "totalExperience": 23568,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 98,
+            "totalExperience": 24056,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 99,
+            "totalExperience": 24549,
+            "skillRewards": 0,
+            "modificationRewards": 1,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        },
+        {
+            "level": 100,
+            "totalExperience": 25047,
+            "skillRewards": 0,
+            "modificationRewards": 0,
+            "maxHealthGain": 8.0,
+            "healthRegenerationGain": 0.0,
+            "baseDamageGain": 0.800000011920929
+        }
+    ]
+}

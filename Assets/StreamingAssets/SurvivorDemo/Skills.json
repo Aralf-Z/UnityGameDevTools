@@ -1,0 +1,1040 @@
+{
+  "version": 3,
+  "skills": [
+    {
+      "id": "Bolt",
+      "enabled": true,
+      "displayName": "能量弹",
+      "description": "自动瞄准射程内最近的敌人，发射能量弹。",
+      "baseStats": {
+        "cooldown": 0.7200000286102295,
+        "radius": 18.0,
+        "projectileCount": 1,
+        "volleyCount": 1,
+        "orbiterCount": 3,
+        "volleyInterval": 0.11999999731779099,
+        "projectileSpeed": 18.0,
+        "projectileLifetime": 1.600000023841858,
+        "projectileSpread": 11.0,
+        "orbitSpeed": 2.700000047683716,
+        "bladeRotationSpeed": 140.0,
+        "orbitHeight": 0.8500000238418579,
+        "hitInterval": 0.4000000059604645,
+        "duration": 2.0,
+        "tickInterval": 0.5,
+        "knockback": 0.0,
+        "knockbackDecay": 6.0,
+        "heavyKnockbackMultiplier": 0.550000011920929,
+        "effectColor": "#E9CC7B",
+        "debuffs": [],
+        "damageMultiplier": 2.1
+      },
+      "modifications": [
+        {
+          "id": "bolt_multishot",
+          "enabled": true,
+          "displayName": "散射弹头",
+          "additionalDescription": "每轮额外发射 2 枚能量弹。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "ProjectileCount",
+              "operation": "Add",
+              "value": 2.0
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "bolt_volley",
+          "enabled": true,
+          "displayName": "连续射击",
+          "additionalDescription": "每次释放额外增加一轮射击。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "VolleyCount",
+              "operation": "Add",
+              "value": 1.0
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "bolt_power",
+          "enabled": true,
+          "displayName": "高能充填",
+          "additionalDescription": "能量弹伤害提高 40%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "DamageMultiplier",
+              "operation": "Multiply",
+              "value": 1.4
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "bolt_reload",
+          "enabled": true,
+          "displayName": "快速充能",
+          "additionalDescription": "冷却缩短 20%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "Cooldown",
+              "operation": "Multiply",
+              "value": 0.8
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "bolt_accelerator",
+          "enabled": true,
+          "displayName": "弹道加速",
+          "additionalDescription": "弹速提高 35%, 存活时间提高 25%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "ProjectileSpeed",
+              "operation": "Multiply",
+              "value": 1.35
+            },
+            {
+              "parameter": "ProjectileLifetime",
+              "operation": "Multiply",
+              "value": 1.25
+            }
+          ],
+          "debuffOverrides": []
+        }
+      ]
+    },
+    {
+      "id": "Orbit",
+      "enabled": true,
+      "displayName": "环形刃",
+      "description": "匕首持续环绕角色，对接触到的敌人造成伤害。",
+      "baseStats": {
+        "cooldown": 0.4000000059604645,
+        "radius": 2.5999999046325684,
+        "projectileCount": 1,
+        "volleyCount": 1,
+        "orbiterCount": 3,
+        "volleyInterval": 0.11999999731779099,
+        "projectileSpeed": 18.0,
+        "projectileLifetime": 1.600000023841858,
+        "projectileSpread": 11.0,
+        "orbitSpeed": 2.700000047683716,
+        "bladeRotationSpeed": 140.0,
+        "orbitHeight": 0.8500000238418579,
+        "hitInterval": 0.4000000059604645,
+        "duration": 2.0,
+        "tickInterval": 0.5,
+        "knockback": 0.0,
+        "knockbackDecay": 6.0,
+        "heavyKnockbackMultiplier": 0.550000011920929,
+        "effectColor": "#B4A5EB",
+        "debuffs": [],
+        "damageMultiplier": 1.4
+      },
+      "modifications": [
+        {
+          "id": "orbit_blades",
+          "enabled": true,
+          "displayName": "双刃增援",
+          "additionalDescription": "增加 2 把环绕匕首。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "OrbiterCount",
+              "operation": "Add",
+              "value": 2.0
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "orbit_range",
+          "enabled": true,
+          "displayName": "延长轨道",
+          "additionalDescription": "环绕半径提高 30%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "Radius",
+              "operation": "Multiply",
+              "value": 1.3
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "orbit_edge",
+          "enabled": true,
+          "displayName": "锋利刀刃",
+          "additionalDescription": "伤害提高 40%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "DamageMultiplier",
+              "operation": "Multiply",
+              "value": 1.4
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "orbit_frequency",
+          "enabled": true,
+          "displayName": "密集切割",
+          "additionalDescription": "同一敌人的命中间隔缩短 25%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "HitInterval",
+              "operation": "Multiply",
+              "value": 0.75
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "orbit_speed",
+          "enabled": true,
+          "displayName": "高速环绕",
+          "additionalDescription": "环绕速度提高 40%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "OrbitSpeed",
+              "operation": "Multiply",
+              "value": 1.4
+            }
+          ],
+          "debuffOverrides": []
+        }
+      ]
+    },
+    {
+      "id": "Nova",
+      "enabled": true,
+      "displayName": "冲击波",
+      "description": "释放土黄色冲击波，造成范围伤害并击退敌人。",
+      "baseStats": {
+        "cooldown": 5.0,
+        "radius": 5.900000095367432,
+        "projectileCount": 1,
+        "volleyCount": 1,
+        "orbiterCount": 3,
+        "volleyInterval": 0.11999999731779099,
+        "projectileSpeed": 18.0,
+        "projectileLifetime": 1.600000023841858,
+        "projectileSpread": 11.0,
+        "orbitSpeed": 2.700000047683716,
+        "bladeRotationSpeed": 140.0,
+        "orbitHeight": 0.8500000238418579,
+        "hitInterval": 0.4000000059604645,
+        "duration": 2.0,
+        "tickInterval": 0.5,
+        "knockback": 14.800000190734863,
+        "knockbackDecay": 6.0,
+        "heavyKnockbackMultiplier": 0.550000011920929,
+        "effectColor": "#C7A05A",
+        "debuffs": [],
+        "damageMultiplier": 3.5
+      },
+      "modifications": [
+        {
+          "id": "nova_radius",
+          "enabled": true,
+          "displayName": "扩散波纹",
+          "additionalDescription": "范围提高 30%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "Radius",
+              "operation": "Multiply",
+              "value": 1.3
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "nova_damage",
+          "enabled": true,
+          "displayName": "过载冲击",
+          "additionalDescription": "伤害提高 50%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "DamageMultiplier",
+              "operation": "Multiply",
+              "value": 1.5
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "nova_cooldown",
+          "enabled": true,
+          "displayName": "快速震荡",
+          "additionalDescription": "冷却缩短 25%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "Cooldown",
+              "operation": "Multiply",
+              "value": 0.75
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "nova_force",
+          "enabled": true,
+          "displayName": "强力排斥",
+          "additionalDescription": "击退初速度提高 50%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "Knockback",
+              "operation": "Multiply",
+              "value": 1.5
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "nova_bleed",
+          "enabled": true,
+          "displayName": "破甲震荡",
+          "additionalDescription": "命中附加 4 秒流血, 每秒扣除当前生命的 3%。",
+          "effectColor": "",
+          "overrides": [],
+          "debuffOverrides": [
+            {
+              "type": "Bleed",
+              "enabled": true,
+              "duration": 4.0,
+              "tickInterval": 1,
+              "currentHealthPercent": 0.03,
+              "moveSpeedMultiplier": 0.5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Frost",
+      "enabled": true,
+      "displayName": "冰霜领域",
+      "description": "白色冲击留下持续 2 秒的冰霜区域，冻结区域内敌人并造成少量持续伤害。",
+      "baseStats": {
+        "cooldown": 8.0,
+        "radius": 3.625,
+        "projectileCount": 1,
+        "volleyCount": 1,
+        "orbiterCount": 3,
+        "volleyInterval": 0.11999999731779099,
+        "projectileSpeed": 18.0,
+        "projectileLifetime": 1.600000023841858,
+        "projectileSpread": 11.0,
+        "orbitSpeed": 2.700000047683716,
+        "bladeRotationSpeed": 140.0,
+        "orbitHeight": 0.8500000238418579,
+        "hitInterval": 0.4000000059604645,
+        "duration": 2.0,
+        "tickInterval": 0.5,
+        "knockback": 0.0,
+        "knockbackDecay": 6.0,
+        "heavyKnockbackMultiplier": 0.550000011920929,
+        "effectColor": "#FFFFFF",
+        "debuffs": [
+          {
+            "type": "Freeze",
+            "enabled": true,
+            "duration": 0.15000000596046448,
+            "tickInterval": 1.0,
+            "currentHealthPercent": 0.05000000074505806,
+            "moveSpeedMultiplier": 0.25
+          }
+        ],
+        "damageMultiplier": 0.2
+      },
+      "modifications": [
+        {
+          "id": "frost_radius",
+          "enabled": true,
+          "displayName": "极寒扩散",
+          "additionalDescription": "领域半径提高 30%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "Radius",
+              "operation": "Multiply",
+              "value": 1.3
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "frost_duration",
+          "enabled": true,
+          "displayName": "长效冰场",
+          "additionalDescription": "领域持续时间提高 50%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "Duration",
+              "operation": "Multiply",
+              "value": 1.5
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "frost_cooldown",
+          "enabled": true,
+          "displayName": "寒流循环",
+          "additionalDescription": "冷却缩短 20%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "Cooldown",
+              "operation": "Multiply",
+              "value": 0.8
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "frost_damage",
+          "enabled": true,
+          "displayName": "碎冰伤害",
+          "additionalDescription": "每跳伤害倍率增加 0.8。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "DamageMultiplier",
+              "operation": "Add",
+              "value": 0.8
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "frost_freeze",
+          "enabled": true,
+          "displayName": "深度冻结",
+          "additionalDescription": "领域施加冻结, 冻结不会超过领域结束时间。",
+          "effectColor": "",
+          "overrides": [],
+          "debuffOverrides": [
+            {
+              "type": "Freeze",
+              "enabled": true,
+              "duration": 5.0,
+              "tickInterval": 1,
+              "currentHealthPercent": 0.02,
+              "moveSpeedMultiplier": 0.5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Lightning",
+      "enabled": true,
+      "displayName": "连锁闪电",
+      "description": "电流在附近敌人之间连锁跳跃, 每次命中不同目标。",
+      "baseStats": {
+        "cooldown": 1.8,
+        "radius": 14.0,
+        "projectileCount": 3,
+        "volleyCount": 1,
+        "orbiterCount": 3,
+        "volleyInterval": 0.12,
+        "projectileSpeed": 18,
+        "projectileLifetime": 1.6,
+        "projectileSpread": 11,
+        "orbitSpeed": 2.7,
+        "bladeRotationSpeed": 140,
+        "orbitHeight": 0.85,
+        "hitInterval": 0.4,
+        "duration": 4,
+        "tickInterval": 0.5,
+        "knockback": 0,
+        "knockbackDecay": 6,
+        "heavyKnockbackMultiplier": 0.55,
+        "dashSpeedMultiplier": 3.8,
+        "invulnerabilityDuration": 0.24,
+        "healing": 0,
+        "targetRange": 18,
+        "effectColor": "#B4A5EB",
+        "debuffs": [],
+        "damageMultiplier": 2.8
+      },
+      "modifications": [
+        {
+          "id": "lightning_chain",
+          "enabled": true,
+          "displayName": "分叉电流",
+          "additionalDescription": "额外命中 2 个目标。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "ProjectileCount",
+              "operation": "Add",
+              "value": 2.0
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "lightning_damage",
+          "enabled": true,
+          "displayName": "高压电弧",
+          "additionalDescription": "伤害提高 50%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "DamageMultiplier",
+              "operation": "Multiply",
+              "value": 1.5
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "lightning_cooldown",
+          "enabled": true,
+          "displayName": "电容循环",
+          "additionalDescription": "冷却缩短 25%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "Cooldown",
+              "operation": "Multiply",
+              "value": 0.75
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "lightning_range",
+          "enabled": true,
+          "displayName": "远距传导",
+          "additionalDescription": "索敌和连锁距离提高 30%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "Radius",
+              "operation": "Multiply",
+              "value": 1.3
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "lightning_slow",
+          "enabled": true,
+          "displayName": "麻痹电流",
+          "additionalDescription": "附加 3 秒 50% 减速。",
+          "effectColor": "",
+          "overrides": [],
+          "debuffOverrides": [
+            {
+              "type": "Slow",
+              "enabled": true,
+              "duration": 3.0,
+              "tickInterval": 1,
+              "currentHealthPercent": 0.02,
+              "moveSpeedMultiplier": 0.5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Flame",
+      "enabled": true,
+      "displayName": "烈焰火环",
+      "description": "生成跟随玩家移动的火焰环, 持续灼烧周围敌人。",
+      "baseStats": {
+        "cooldown": 5.0,
+        "radius": 3.2,
+        "projectileCount": 1,
+        "volleyCount": 1,
+        "orbiterCount": 3,
+        "volleyInterval": 0.12,
+        "projectileSpeed": 18,
+        "projectileLifetime": 1.6,
+        "projectileSpread": 11,
+        "orbitSpeed": 2.7,
+        "bladeRotationSpeed": 140,
+        "orbitHeight": 0.85,
+        "hitInterval": 0.4,
+        "duration": 4,
+        "tickInterval": 0.5,
+        "knockback": 0,
+        "knockbackDecay": 6,
+        "heavyKnockbackMultiplier": 0.55,
+        "dashSpeedMultiplier": 3.8,
+        "invulnerabilityDuration": 0.24,
+        "healing": 0,
+        "targetRange": 18,
+        "effectColor": "#FF9F54",
+        "debuffs": [],
+        "damageMultiplier": 1.0
+      },
+      "modifications": [
+        {
+          "id": "flame_duration",
+          "enabled": true,
+          "displayName": "持久燃烧",
+          "additionalDescription": "火环持续时间提高 50%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "Duration",
+              "operation": "Multiply",
+              "value": 1.5
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "flame_radius",
+          "enabled": true,
+          "displayName": "烈焰扩散",
+          "additionalDescription": "火环范围提高 30%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "Radius",
+              "operation": "Multiply",
+              "value": 1.3
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "flame_damage",
+          "enabled": true,
+          "displayName": "炽热核心",
+          "additionalDescription": "每跳伤害提高 50%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "DamageMultiplier",
+              "operation": "Multiply",
+              "value": 1.5
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "flame_tick",
+          "enabled": true,
+          "displayName": "高频灼烧",
+          "additionalDescription": "伤害间隔缩短 30%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "TickInterval",
+              "operation": "Multiply",
+              "value": 0.7
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "flame_bleed",
+          "enabled": true,
+          "displayName": "灼伤",
+          "additionalDescription": "命中附加 4 秒流血, 每秒扣除当前生命的 4%。",
+          "effectColor": "",
+          "overrides": [],
+          "debuffOverrides": [
+            {
+              "type": "Bleed",
+              "enabled": true,
+              "duration": 4.0,
+              "tickInterval": 1,
+              "currentHealthPercent": 0.04,
+              "moveSpeedMultiplier": 0.5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Missile",
+      "enabled": true,
+      "displayName": "追踪导弹",
+      "description": "发射追踪导弹, 命中或到期时产生范围爆炸。",
+      "baseStats": {
+        "cooldown": 2.8,
+        "radius": 2.4,
+        "projectileCount": 1,
+        "volleyCount": 1,
+        "orbiterCount": 3,
+        "volleyInterval": 0.12,
+        "projectileSpeed": 11,
+        "projectileLifetime": 4,
+        "projectileSpread": 11,
+        "orbitSpeed": 2.7,
+        "bladeRotationSpeed": 140,
+        "orbitHeight": 0.85,
+        "hitInterval": 0.4,
+        "duration": 4,
+        "tickInterval": 0.5,
+        "knockback": 0,
+        "knockbackDecay": 6,
+        "heavyKnockbackMultiplier": 0.55,
+        "dashSpeedMultiplier": 3.8,
+        "invulnerabilityDuration": 0.24,
+        "healing": 0,
+        "targetRange": 22,
+        "effectColor": "#FFD96B",
+        "debuffs": [],
+        "damageMultiplier": 4.5
+      },
+      "modifications": [
+        {
+          "id": "missile_count",
+          "enabled": true,
+          "displayName": "双联发射",
+          "additionalDescription": "额外发射一枚追踪导弹。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "ProjectileCount",
+              "operation": "Add",
+              "value": 1.0
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "missile_radius",
+          "enabled": true,
+          "displayName": "扩大爆破",
+          "additionalDescription": "爆炸范围提高 40%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "Radius",
+              "operation": "Multiply",
+              "value": 1.4
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "missile_damage",
+          "enabled": true,
+          "displayName": "高爆装药",
+          "additionalDescription": "爆炸伤害提高 50%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "DamageMultiplier",
+              "operation": "Multiply",
+              "value": 1.5
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "missile_cooldown",
+          "enabled": true,
+          "displayName": "快速装填",
+          "additionalDescription": "冷却缩短 25%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "Cooldown",
+              "operation": "Multiply",
+              "value": 0.75
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "missile_speed",
+          "enabled": true,
+          "displayName": "推进器",
+          "additionalDescription": "飞行速度提高 40%, 存活时间提高 20%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "ProjectileSpeed",
+              "operation": "Multiply",
+              "value": 1.4
+            },
+            {
+              "parameter": "ProjectileLifetime",
+              "operation": "Multiply",
+              "value": 1.2
+            }
+          ],
+          "debuffOverrides": []
+        }
+      ]
+    },
+    {
+      "id": "Venom",
+      "enabled": true,
+      "displayName": "腐蚀毒池",
+      "description": "在敌人脚下生成毒池, 持续伤害并施加流血和减速。",
+      "baseStats": {
+        "cooldown": 4.5,
+        "radius": 3.5,
+        "projectileCount": 1,
+        "volleyCount": 1,
+        "orbiterCount": 3,
+        "volleyInterval": 0.12,
+        "projectileSpeed": 18,
+        "projectileLifetime": 1.6,
+        "projectileSpread": 11,
+        "orbitSpeed": 2.7,
+        "bladeRotationSpeed": 140,
+        "orbitHeight": 0.85,
+        "hitInterval": 0.4,
+        "duration": 5,
+        "tickInterval": 0.8,
+        "knockback": 0,
+        "knockbackDecay": 6,
+        "heavyKnockbackMultiplier": 0.55,
+        "dashSpeedMultiplier": 3.8,
+        "invulnerabilityDuration": 0.24,
+        "healing": 0,
+        "targetRange": 16,
+        "effectColor": "#8DD97B",
+        "debuffs": [
+          {
+            "type": "Bleed",
+            "enabled": true,
+            "duration": 3.0,
+            "tickInterval": 1,
+            "currentHealthPercent": 0.02,
+            "moveSpeedMultiplier": 0.5
+          },
+          {
+            "type": "Slow",
+            "enabled": true,
+            "duration": 2.0,
+            "tickInterval": 1,
+            "currentHealthPercent": 0.02,
+            "moveSpeedMultiplier": 0.65
+          }
+        ],
+        "damageMultiplier": 0.6
+      },
+      "modifications": [
+        {
+          "id": "venom_radius",
+          "enabled": true,
+          "displayName": "毒雾扩散",
+          "additionalDescription": "毒池范围提高 30%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "Radius",
+              "operation": "Multiply",
+              "value": 1.3
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "venom_duration",
+          "enabled": true,
+          "displayName": "长效毒素",
+          "additionalDescription": "毒池持续时间提高 50%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "Duration",
+              "operation": "Multiply",
+              "value": 1.5
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "venom_damage",
+          "enabled": true,
+          "displayName": "剧毒浓缩",
+          "additionalDescription": "每跳伤害提高 40%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "DamageMultiplier",
+              "operation": "Multiply",
+              "value": 1.4
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "venom_tick",
+          "enabled": true,
+          "displayName": "加速侵蚀",
+          "additionalDescription": "伤害间隔缩短 30%。",
+          "effectColor": "",
+          "overrides": [
+            {
+              "parameter": "TickInterval",
+              "operation": "Multiply",
+              "value": 0.7
+            }
+          ],
+          "debuffOverrides": []
+        },
+        {
+          "id": "venom_bleed",
+          "enabled": true,
+          "displayName": "腐蚀毒素",
+          "additionalDescription": "流血提升为 5 秒, 每秒扣除当前生命的 4%。",
+          "effectColor": "",
+          "overrides": [],
+          "debuffOverrides": [
+            {
+              "type": "Bleed",
+              "enabled": true,
+              "duration": 5.0,
+              "tickInterval": 1,
+              "currentHealthPercent": 0.04,
+              "moveSpeedMultiplier": 0.5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "dash": {
+    "id": "Dash",
+    "enabled": true,
+    "displayName": "冲刺",
+    "description": "按空格向面朝方向冲刺, 冲刺时获得短暂无敌。",
+    "baseStats": {
+      "cooldown": 3.0,
+      "radius": 1.8,
+      "projectileCount": 1,
+      "volleyCount": 1,
+      "orbiterCount": 3,
+      "volleyInterval": 0.12,
+      "projectileSpeed": 18,
+      "projectileLifetime": 1.6,
+      "projectileSpread": 11,
+      "orbitSpeed": 2.7,
+      "bladeRotationSpeed": 140,
+      "orbitHeight": 0.85,
+      "hitInterval": 0.4,
+      "duration": 0.24,
+      "tickInterval": 0.5,
+      "knockback": 0,
+      "knockbackDecay": 6,
+      "heavyKnockbackMultiplier": 0.55,
+      "dashSpeedMultiplier": 3.8,
+      "invulnerabilityDuration": 0.24,
+      "healing": 0,
+      "targetRange": 18,
+      "effectColor": "#65DDD3",
+      "debuffs": [],
+      "damageMultiplier": 0.0
+    },
+    "modifications": [
+      {
+        "id": "dash_cooldown",
+        "enabled": true,
+        "displayName": "轻装疾行",
+        "additionalDescription": "冲刺冷却缩短 25%。",
+        "effectColor": "",
+        "overrides": [
+          {
+            "parameter": "Cooldown",
+            "operation": "Multiply",
+            "value": 0.75
+          }
+        ],
+        "debuffOverrides": []
+      },
+      {
+        "id": "dash_duration",
+        "enabled": true,
+        "displayName": "延长冲刺",
+        "additionalDescription": "冲刺持续时间和无敌时间提高 50%。",
+        "effectColor": "",
+        "overrides": [
+          {
+            "parameter": "Duration",
+            "operation": "Multiply",
+            "value": 1.5
+          },
+          {
+            "parameter": "InvulnerabilityDuration",
+            "operation": "Multiply",
+            "value": 1.5
+          }
+        ],
+        "debuffOverrides": []
+      },
+      {
+        "id": "dash_speed",
+        "enabled": true,
+        "displayName": "爆发加速",
+        "additionalDescription": "冲刺速度倍率提高 40%。",
+        "effectColor": "",
+        "overrides": [
+          {
+            "parameter": "DashSpeedMultiplier",
+            "operation": "Multiply",
+            "value": 1.4
+          }
+        ],
+        "debuffOverrides": []
+      },
+      {
+        "id": "dash_damage",
+        "enabled": true,
+        "displayName": "冲刺冲击",
+        "additionalDescription": "冲刺开始时对附近敌人造成 3 倍基础伤害, 半径增加 1.2。",
+        "effectColor": "",
+        "overrides": [
+          {
+            "parameter": "DamageMultiplier",
+            "operation": "Set",
+            "value": 3.0
+          },
+          {
+            "parameter": "Radius",
+            "operation": "Add",
+            "value": 1.2
+          }
+        ],
+        "debuffOverrides": []
+      },
+      {
+        "id": "dash_heal",
+        "enabled": true,
+        "displayName": "应急恢复",
+        "additionalDescription": "每次冲刺回复 8 点生命。",
+        "effectColor": "",
+        "overrides": [
+          {
+            "parameter": "Healing",
+            "operation": "Set",
+            "value": 8.0
+          }
+        ],
+        "debuffOverrides": []
+      }
+    ]
+  }
+}

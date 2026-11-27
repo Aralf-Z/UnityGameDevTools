@@ -6,7 +6,8 @@ using UnityEngine;
 namespace Sanmon.SurvivorDemo
 {
     public enum EnemyKind { Grunt, Runner, Tank }
-    public enum SkillKind { Bolt, Orbit, Nova, Frost }
+    public enum SkillKind { Bolt = 0, Orbit = 1, Nova = 2, Frost = 3, Lightning = 4, Flame = 5, Missile = 6, Venom = 7, Dash = 8 }
+    public enum SurvivorRewardKind { Skill = 0, Modification = 1 }
 
     public readonly struct ArenaPoint
     {
@@ -22,15 +23,18 @@ namespace Sanmon.SurvivorDemo
     {
         [DebugInfo("生命", Color = "#65DDD3")] public float Health = 100;
         [DebugInfo("生命上限")] public float MaxHealth = 100;
+        /// <summary> 每秒恢复的生命值, 0 表示不恢复. </summary>
+        [DebugInfo("每秒生命恢复", Color = "#65DDD3")] public float HealthRegenerationPerSecond = 1;
         [DebugInfo("移动速度")] public float MoveSpeed = 6;
-        [DebugInfo("伤害倍率")] public float DamageMultiplier = 1;
+        [DebugInfo("基础伤害")] public float BaseDamage = 10;
         [DebugInfo("无敌")] public bool GodMode;
         [DebugInfo("等级", Color = "#E9CC7B")] public int Level = 1;
-        [DebugInfo("经验")] public int Experience;
+        [DebugInfo("累计经验")] public int Experience;
         [DebugInfo("击杀")] public int Kills;
         [DebugInfo("波次")] public int Wave = 1;
         [DebugInfo("生存秒数")] public float Elapsed;
-        public int ExperienceRequired => 8 + (Level - 1) * 5;
+        /// <summary> 到达下一等级所需的累计总经验. </summary>
+        public int ExperienceRequired { get; internal set; } = 8;
     }
 
     // 冷色石质试验场，青色胶囊玩家与珊瑚色敌人；金色经验与技能强调色。

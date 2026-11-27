@@ -14,15 +14,15 @@ namespace Sanmon.SurvivorDemo
         private Label _healthText, _statusText, _timeText, _experienceText, _toastText, _modalTitle, _modalDescription;
         private VisualElement _healthFill, _experienceFill, _modal;
         private Button _resume;
-        private readonly Label[] _skillNames = new Label[5];
-        private readonly Label[] _skillTitles = new Label[4];
-        private VisualElement _upgradeModal;
-        private Label _upgradeSubtitle;
-        private readonly Button[] _upgradeButtons = new Button[4];
-        private readonly Label[] _upgradeNames = new Label[4];
-        private readonly Label[] _upgradeDescriptions = new Label[4];
-        private readonly Label[] _upgradeProgress = new Label[4];
-        private readonly Label[] _upgradeSkillTitles = new Label[4];
+        private readonly Label[] _skillNames = new Label[SurvivorSkills.SKILL_COUNT];
+        private readonly Label[] _skillTitles = new Label[SurvivorSkills.COMBAT_SKILL_COUNT];
+        private VisualElement _rewardModal;
+        private Label _rewardSubtitle, _rewardTitle;
+        private readonly Button[] _rewardButtons = new Button[3];
+        private readonly Label[] _rewardNames = new Label[3];
+        private readonly Label[] _rewardDescriptions = new Label[3];
+        private readonly Label[] _rewardProgress = new Label[3];
+        private readonly Label[] _rewardSkillTitles = new Label[3];
         private float _toastUntil;
         private float _shownHealth = 1;
         private float _shownExperience;
@@ -75,7 +75,7 @@ namespace Sanmon.SurvivorDemo
             controls.Add(row);
             AddButton(row, "重启工具", () => RestartTools());
             AddButton(row, "释放工具", () => Tools?.Shutdown());
-            Text(controls, "DemoHelp() 查看命令和宏示例", 13, SurvivorPalette.Muted);
+            Text(controls, "SurvivorHelp() 查看开发命令", 13, SurvivorPalette.Muted);
 
             var bottom = new VisualElement();
             bottom.style.position = Position.Absolute;
@@ -85,18 +85,20 @@ namespace Sanmon.SurvivorDemo
             bottom.style.flexDirection = FlexDirection.Row;
             bottom.style.justifyContent = Justify.Center;
             root.Add(bottom);
-            var names = new string[5];
-            for (var i = 0; i < 4; i++) names[i] = SkillName((SkillKind)i) + " / AUTO";
-            names[4] = "SPACE  冲刺";
-            for (var i = 0; i < 5; i++)
+            var names = new string[SurvivorSkills.SKILL_COUNT];
+            for (var i = 0; i < SurvivorSkills.COMBAT_SKILL_COUNT; i++) names[i] = SkillName((SkillKind)i) + " / AUTO";
+            names[(int)SkillKind.Dash] = "SPACE  冲刺";
+            for (var i = 0; i < SurvivorSkills.SKILL_COUNT; i++)
             {
                 var card = new VisualElement();
                 StyleCard(card);
-                card.style.width = 180;
+                card.style.flexGrow = 1;
+                card.style.flexBasis = 0;
+                card.style.maxWidth = 180;
                 card.style.marginLeft = card.style.marginRight = 4;
                 bottom.Add(card);
                 var title = Text(card, names[i], 14, i == 3 ? SurvivorPalette.Frost : SurvivorPalette.Text);
-                if (i < 4) _skillTitles[i] = title;
+                if (i < SurvivorSkills.COMBAT_SKILL_COUNT) _skillTitles[i] = title;
                 _skillNames[i] = Text(card, "READY", 16, SurvivorPalette.Player);
             }
 
@@ -127,86 +129,7 @@ namespace Sanmon.SurvivorDemo
             _resume = AddButton(dialog, "继续 / Esc", () => SetPaused(false));
             AddButton(dialog, "重新开始", () => RestartRun());
             AddButton(dialog, "打开 GameDevTools", () => { if (Tools?.Console == null) RestartTools(); else Tools.Open(); });
-            BuildUpgradeHud(root);
-        }
-
-        private void BuildUpgradeHud(VisualElement root)
-        {
-            _upgradeModal = new VisualElement { name = "skillUpgradeScreen", pickingMode = PickingMode.Position };
-            _upgradeModal.style.position = Position.Absolute;
-            _upgradeModal.style.left = _upgradeModal.style.right = _upgradeModal.style.top = _upgradeModal.style.bottom = 0;
-            _upgradeModal.style.alignItems = Align.Center;
-            _upgradeModal.style.justifyContent = Justify.Center;
-            _upgradeModal.style.backgroundColor = SurvivorPalette.Alpha(SurvivorPalette.Shadow, 0.94f);
-            _upgradeModal.style.display = DisplayStyle.None;
-            root.Add(_upgradeModal);
-            var dialog = new VisualElement();
-            StyleCard(dialog);
-            dialog.style.width = 720;
-            dialog.style.maxWidth = Length.Percent(95);
-            dialog.style.paddingLeft = dialog.style.paddingRight = 24;
-            dialog.style.paddingTop = dialog.style.paddingBottom = 24;
-            _upgradeModal.Add(dialog);
-            Text(dialog, "LEVEL UP / 技能升级", 30, SurvivorPalette.Gold);
-            _upgradeSubtitle = Text(dialog, string.Empty, 16, SurvivorPalette.Text);
-            _upgradeSubtitle.style.marginBottom = 12;
-            for (var rowIndex = 0; rowIndex < 2; rowIndex++)
-            {
-                var row = new VisualElement();
-                row.style.flexDirection = FlexDirection.Row;
-                dialog.Add(row);
-                for (var column = 0; column < 2; column++)
-                {
-                    var index = rowIndex * 2 + column;
-                    var skill = (SkillKind)index;
-                    var button = new Button(() => ChooseSkillUpgrade(skill)) { name = "upgrade" + skill, focusable = false };
-                    StyleCard(button);
-                    button.style.flexGrow = 1;
-                    button.style.flexBasis = 0;
-                    button.style.height = 220;
-                    button.style.marginLeft = button.style.marginRight = 4;
-                    button.style.marginBottom = 8;
-                    button.style.alignItems = Align.Stretch;
-                    button.style.unityTextAlign = TextAnchor.UpperLeft;
-                    button.style.borderTopWidth = button.style.borderRightWidth = button.style.borderBottomWidth = 0;
-                    button.RegisterCallback<PointerEnterEvent>(_ => { if (button.enabledSelf) button.style.backgroundColor = SurvivorPalette.Stone; });
-                    button.RegisterCallback<PointerLeaveEvent>(_ => button.style.backgroundColor = SurvivorPalette.Alpha(SurvivorPalette.Shadow, 0.92f));
-                    row.Add(button);
-                    _upgradeButtons[index] = button;
-                    _upgradeSkillTitles[index] = Text(button, SkillName(skill), 16, SurvivorPalette.Text);
-                    _upgradeNames[index] = Text(button, string.Empty, 23, SurvivorPalette.Gold);
-                    _upgradeDescriptions[index] = Text(button, string.Empty, 14, SurvivorPalette.Text);
-                    _upgradeDescriptions[index].style.whiteSpace = WhiteSpace.Normal;
-                    _upgradeDescriptions[index].style.flexGrow = 1;
-                    _upgradeProgress[index] = Text(button, string.Empty, 13, SurvivorPalette.Muted);
-                }
-            }
-            Text(dialog, "点击一张卡片升级，后续强化会保留已有能力。", 14, SurvivorPalette.Muted);
-        }
-
-        private void RefreshUpgradeHud()
-        {
-            if (_upgradeModal == null) return;
-            _upgradeModal.style.display = IsChoosingUpgrade ? DisplayStyle.Flex : DisplayStyle.None;
-            if (!IsChoosingUpgrade) return;
-            _upgradeSubtitle.text = "LEVEL " + Stats.Level + " · 选择 1 个技能 · 剩余选择次数 " + PendingUpgrades;
-            for (var i = 0; i < 4; i++)
-            {
-                var skill = (SkillKind)i;
-                var tier = SkillTier(skill);
-                var definition = _skills.Get(skill);
-                var maxTier = definition.MaxTier;
-                var available = CanUpgradeSkill(skill);
-                var nextTier = Mathf.Min(tier + 1, maxTier);
-                var upgrade = definition.Upgrade(nextTier);
-                _upgradeButtons[i].SetEnabled(available);
-                _upgradeButtons[i].style.opacity = available ? 1 : 0.45f;
-                _upgradeSkillTitles[i].text = SkillName(skill);
-                _upgradeNames[i].text = nextTier == 0 ? "暂无强化" : "T" + nextTier + "  " + UpgradeName(skill, nextTier);
-                _upgradeDescriptions[i].text = "基础：" + definition.description + (upgrade == null ? "" : "\n\n本次强化：" + upgrade.additionalDescription);
-                _upgradeButtons[i].tooltip = _skills.Description(skill, nextTier);
-                _upgradeProgress[i].text = SkillLevel(skill) == 0 ? "技能已关闭" : available ? "已升级 " + tier + "/" + maxTier + " · 点击选择" : "已升级 " + tier + "/" + maxTier + " · 已满级";
-            }
+            BuildRewardHud(root);
         }
 
         private static VisualElement Card(VisualElement parent, float left, float top, float width)
@@ -283,35 +206,41 @@ namespace Sanmon.SurvivorDemo
         {
             if (_healthText == null) return;
             var health = Stats.Health / Stats.MaxHealth;
-            var experience = Mathf.Clamp01(Stats.Experience / (float)Stats.ExperienceRequired);
+            var currentThreshold = _levels.Get(Stats.Level).totalExperience;
+            var required = Stats.ExperienceRequired - currentThreshold;
+            var experience = Stats.Level >= _levels.MaxLevel ? 1 : Mathf.Clamp01((Stats.Experience - currentThreshold) / (float)Mathf.Max(1, required));
             var ease = immediate ? 1 : 1 - Mathf.Exp(-12 * Time.unscaledDeltaTime);
             _shownHealth = Mathf.Lerp(_shownHealth, health, ease);
             _shownExperience = Mathf.Lerp(_shownExperience, experience, ease);
             _healthFill.style.width = Length.Percent(_shownHealth * 100);
             _experienceFill.style.width = Length.Percent(_shownExperience * 100);
             _healthText.text = "HP " + Mathf.CeilToInt(Stats.Health) + " / " + Mathf.CeilToInt(Stats.MaxHealth) + (Stats.GodMode ? "  [GOD]" : string.Empty);
-            _experienceText.text = "LEVEL " + Stats.Level + "    " + Stats.Experience + " / " + Stats.ExperienceRequired;
+            if (Stats.HealthRegenerationPerSecond > 0) _healthText.text += "  +" + Stats.HealthRegenerationPerSecond.ToString("0.##") + "/s";
+            _experienceText.text = Stats.Level >= _levels.MaxLevel
+                ? "LEVEL " + Stats.Level + "  MAX · 累计 " + Stats.Experience
+                : "LEVEL " + Stats.Level + "    累计 " + Stats.Experience + " / " + Stats.ExperienceRequired;
             var remaining = Mathf.Max(0, Mathf.CeilToInt(RunDuration - Stats.Elapsed));
             _timeText.text = (remaining / 60).ToString("00") + ":" + (remaining % 60).ToString("00");
             _statusText.text = "WAVE " + Stats.Wave + "   KILLS " + Stats.Kills + "   敌人 " + EnemyCount;
-            for (var i = 0; i < 4; i++)
+            for (var i = 0; i < SurvivorSkills.COMBAT_SKILL_COUNT; i++)
             {
-                var cooldown = SkillCooldown((SkillKind)i);
-                var tier = SkillTier((SkillKind)i);
-                var stage = tier == 0 ? "基础" : "T" + tier + " " + UpgradeName((SkillKind)i, tier);
-                _skillTitles[i].text = SkillName((SkillKind)i) + " / AUTO";
-                _skillTitles[i].tooltip = _skills.Description((SkillKind)i, tier);
-                _skillNames[i].text = _skillLevels[i] == 0 ? "关闭" : stage + (cooldown > 0 ? "  " + cooldown.ToString("0.0") + "s" : "  READY");
+                var skill = (SkillKind)i;
+                _skillNames[i].parent.style.display = HasSkill(skill) ? DisplayStyle.Flex : DisplayStyle.None;
+                var cooldown = SkillCooldown(skill);
+                _skillTitles[i].text = SkillName(skill) + " / AUTO";
+                _skillTitles[i].tooltip = _skills.Description(skill, ModificationMask(skill));
+                _skillNames[i].text = "改造 " + ModificationCount(skill) + "/5" + (cooldown > 0 ? "  " + cooldown.ToString("0.0") + "s" : "  READY");
             }
             var dash = Mathf.Max(0, _dashReadyAt - Stats.Elapsed);
-            _skillNames[4].text = dash > 0 ? dash.ToString("0.0") + "s" : "READY";
+            _skillNames[(int)SkillKind.Dash].text = "改造 " + ModificationCount(SkillKind.Dash) + "/5  " + (dash > 0 ? dash.ToString("0.0") + "s" : "READY");
+            _skillNames[(int)SkillKind.Dash].tooltip = _skills.Description(SkillKind.Dash, ModificationMask(SkillKind.Dash));
             _toastText.style.display = Time.unscaledTime < _toastUntil ? DisplayStyle.Flex : DisplayStyle.None;
-            _modal.style.display = (IsPaused || HasEnded) && !IsChoosingUpgrade ? DisplayStyle.Flex : DisplayStyle.None;
+            _modal.style.display = (IsPaused || HasEnded) && !IsChoosingReward ? DisplayStyle.Flex : DisplayStyle.None;
             _resume.style.display = HasEnded ? DisplayStyle.None : DisplayStyle.Flex;
             _modalTitle.text = HasEnded ? HasWon ? "SURVIVED" : "RUN ENDED" : "PAUSED";
             _modalTitle.style.color = HasEnded && !HasWon ? SurvivorPalette.Enemy : SurvivorPalette.Player;
             _modalDescription.text = HasEnded ? "击杀 " + Stats.Kills + " · 等级 " + Stats.Level + " · 最佳 " + _bestKills + "\n重新开始即可继续测试。" : "世界模拟已暂停。\nGameDevTools 和宏仍可操作。";
-            RefreshUpgradeHud();
+            RefreshRewardHud();
         }
 
         private void ReleaseHud()

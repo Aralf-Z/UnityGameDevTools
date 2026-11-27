@@ -128,20 +128,39 @@ namespace Sanmon.SurvivorDemo
             return material;
         }
 
-        private Enemy CreateEnemy(EnemyKind kind)
+        private Enemy CreateEnemy(string id)
         {
-            var root = new GameObject(kind.ToString()).transform;
+            var root = new GameObject(id).transform;
             root.SetParent(_world, false);
-            var tank = kind == EnemyKind.Tank;
-            var color = tank ? SurvivorPalette.Tank : kind == EnemyKind.Runner ? SurvivorPalette.Gold : SurvivorPalette.Enemy;
-            var body = Shape("Body", tank ? PrimitiveType.Cube : PrimitiveType.Capsule, root, Vector3.up * (tank ? 0.9f : 0.8f), tank ? new Vector3(1.5f, 1.8f, 1.5f) : new Vector3(0.7f, 0.8f, 0.7f), color);
             var healthBar = new GameObject("Health Bar").transform;
             healthBar.SetParent(root, false);
             healthBar.localPosition = Vector3.up * 2.15f;
             healthBar.rotation = _camera.transform.rotation;
             Shape("Health Background", PrimitiveType.Cube, healthBar, Vector3.zero, new Vector3(0.9f, 0.09f, 0.1f), SurvivorPalette.Shadow);
             var bar = Shape("Health", PrimitiveType.Cube, healthBar, new Vector3(0, 0, -0.06f), new Vector3(0.85f, 0.07f, 0.08f), SurvivorPalette.Player).transform;
-            return new Enemy { root = root, body = body, healthBar = healthBar, bar = bar, kind = kind, radius = tank ? 0.85f : 0.45f };
+            var enemy = new Enemy { root = root, healthBar = healthBar, bar = bar, id = id };
+            ApplyEnemyAppearance(enemy, _enemyCatalog.Get(id));
+            return enemy;
+        }
+
+        private void ApplyEnemyAppearance(Enemy enemy, SurvivorEnemyDefinition definition)
+        {
+            var scale = Vector3.Lerp(definition.scaleMin, definition.scaleMax, enemy.sizeSample);
+            if (enemy.body == null || enemy.shape != definition.primitive)
+            {
+                if (enemy.body != null) Destroy(enemy.body.gameObject);
+                enemy.body = Shape("Body", definition.primitive, enemy.root, Vector3.zero, scale, definition.color);
+                enemy.shape = definition.primitive;
+            }
+            var halfHeight = scale.y * 0.5f;
+            if (definition.primitive == PrimitiveType.Capsule || definition.primitive == PrimitiveType.Cylinder) halfHeight = scale.y;
+            enemy.body.transform.localScale = scale;
+            enemy.body.transform.localPosition = Vector3.up * halfHeight;
+            enemy.body.sharedMaterial = MaterialFor(definition.color);
+            enemy.healthBar.localPosition = Vector3.up * (halfHeight * 2 + 0.35f);
+            enemy.root.name = definition.displayName + " (" + definition.id + ")";
+            var midpoint = (definition.scaleMin + definition.scaleMax) * 0.5f;
+            enemy.radius = definition.radius * Mathf.Max(scale.x, scale.z) / Mathf.Max(midpoint.x, midpoint.z);
         }
 
         private void ConfigureOrbiters()
@@ -239,7 +258,7 @@ namespace Sanmon.SurvivorDemo
 
         private RingEffect Burst(Vector3 position, float radius, Color color, float duration = 0.45f, bool persistent = false)
         {
-            if (_effects.Count >= 64) return null;
+            if (_effects.Count >= 256) return null;
             RingEffect effect;
             if (_effectPool.Count > 0) effect = _effectPool.Pop();
             else
@@ -256,6 +275,7 @@ namespace Sanmon.SurvivorDemo
                 for (var i = 0; i < 48; i++) { var angle = i * Mathf.PI * 2 / 48; line.SetPosition(i, new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle))); }
                 effect = new RingEffect { line = line };
             }
+            effect.generation++;
             effect.line.sharedMaterial = EffectMaterial();
             effect.line.transform.position = position + Vector3.up * 0.12f;
             effect.line.transform.localScale = persistent ? new Vector3(radius, 1, radius) : Vector3.one * 0.1f;
@@ -412,7 +432,9 @@ namespace Sanmon.SurvivorDemo
         internal Sprite PresetIcon(string key)
         {
             if (_presetIcons.TryGetValue(key, out var icon)) return icon;
-            var color = System.Enum.TryParse(key, out SkillKind skill) ? _skills.Resolve(skill, 0).color : key == "Tank" ? SurvivorPalette.Tank : key == "Grunt" ? SurvivorPalette.Enemy : SurvivorPalette.Gold;
+            var color = SurvivorPalette.Gold;
+            if (System.Enum.TryParse(key, out SkillKind skill)) color = _skills.Resolve(skill, 0).color;
+            else if (_enemyCatalog.Contains(key)) color = _enemyCatalog.Get(key).color;
             var texture = new Texture2D(12, 12, TextureFormat.RGBA32, false) { name = "Preset " + key, filterMode = FilterMode.Point };
             for (var y = 0; y < 12; y++) for (var x = 0; x < 12; x++) texture.SetPixel(x, y, x < 2 || y < 2 || x > 9 || y > 9 ? SurvivorPalette.Shadow : color);
             texture.Apply();
@@ -434,7 +456,7 @@ namespace Sanmon.SurvivorDemo
             foreach (var icon in _presetIcons.Values) { Destroy(icon.texture); Destroy(icon); }
         }
 
-        private sealed class RingEffect { public LineRenderer line; public float life, duration, radius, expiresAt; public Color color; public bool persistent; }
+        private sealed class RingEffect { public LineRenderer line; public float life, duration, radius, expiresAt; public Color color; public bool persistent; public int generation; }
         private sealed class ParticleEffect { public ParticleSystem system; public float life; }
         private readonly struct CameraState
         {

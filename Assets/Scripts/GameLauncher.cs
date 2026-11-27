@@ -1,3 +1,4 @@
+using System.Collections;
 using GameConsole;
 using Sanmon.SurvivorDemo;
 using UnityEngine;
@@ -8,8 +9,10 @@ public class GameLauncher : MonoBehaviour
     public string fontAsset = "Font/AliPuHui";
     public GameDevToolsController gdt;
 
-    private void Start()
+    private IEnumerator Start()
     {
+        SurvivorConfiguration configuration = null;
+        yield return SurvivorConfiguration.LoadAsync(value => configuration = value);
         if (gdt == null) gdt = GameDevToolsController.Instance;
         if (gdt == null) gdt = FindObjectOfType<GameDevToolsController>();
         if (gdt == null) gdt = new GameObject("GameDevTools").AddComponent<GameDevToolsController>();
@@ -20,6 +23,6 @@ public class GameLauncher : MonoBehaviour
 
         var arena = GetComponent<SurvivorArena>();
         if (arena == null) arena = gameObject.AddComponent<SurvivorArena>();
-        arena.Initialize(gdt, font);
+        arena.Initialize(gdt, font, configuration);
     }
 }
